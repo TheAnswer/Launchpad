@@ -49,12 +49,16 @@ void InstallFromSWG::copyFinished() {
 }
 
 void InstallFromSWG::closeEvent(QCloseEvent* event) {
+    qDebug() << "close event";
+
     cancelThreads = true;
 
     if (copyWatcher.isRunning()) {
         copyWatcher.cancel();
         copyWatcher.waitForFinished();
     }
+
+    done(2);
 
     QDialog::closeEvent(event);
 }
@@ -68,12 +72,12 @@ int InstallFromSWG::copyFiles() {
         //if (QDir(file))
 
         if (file.first.contains("/")) {
-            QString dir = emuFolder + "\\" + file.first.mid(0, file.first.lastIndexOf("/"));
+            QString dir = emuFolder + file.first.mid(0, file.first.lastIndexOf("/"));
 
             QDir(dir).mkpath(".");
         }
 
-        bool result = QFile::copy(swgfolder + "\\" + file.first, emuFolder + "\\" + file.first);
+        bool result = QFile::copy(swgfolder + "\\" + file.first, emuFolder + file.first);
 
         //bool result = true;
         //QTimer::singleShot(0, this, SLOT(fileCopied(file.first, result)));
@@ -89,15 +93,9 @@ int InstallFromSWG::copyFiles() {
 void InstallFromSWG::fileCopied(const QString& file, bool success) {
     if (success) {
         ui->label->setText(file + " successfully installed");
-
-        ui->progressBar->setValue(ui->progressBar->value()+ 1);
-    } else {
-        //ui->label->setPalette(QPalette(Qt::red));
-        ui->label->setText("Unable to copy file: " + file);
-
-        ui->progressBar->setValue(ui->progressBar->maximum());
     }
 
+    ui->progressBar->setValue(ui->progressBar->value() + 1);
 }
 
 int InstallFromSWG::checkSWGFolder() {
@@ -142,10 +140,18 @@ int InstallFromSWG::installFiles() {
                                                     QFileDialog::ShowDirsOnly
                                                     | QFileDialog::DontResolveSymlinks);
 
-    if (!QDir(emuFolder).exists()) {
+    if (!QDir(emuFolder).exists() || emuFolder.isEmpty()) {
         QMessageBox::warning(this, "Folder", "The swgemu folder you selected isnt a valid directory");
 
         return 1;
+    }
+
+    //qDebug() << emuFolder;
+    emuFolder = emuFolder + "/SWGEmu/";
+
+    if (QDir(emuFolder).exists()) {
+        if (QMessageBox::question(this, "Warning", "SWGEmu folder already exists, do you want to overwrite?") != QMessageBox::Yes)
+            return 3;
     }
 
     QVector<QPair<QString, qint64> > requiredFiles = MainWindow::getRequiredFiles();

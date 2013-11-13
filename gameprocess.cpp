@@ -56,7 +56,7 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
     connect(process, SIGNAL(started()), this, SLOT(started()));
 
     QStringList env = process->environment();
-    env.append("SWGCLIENT_MEMORY_SIZE_MB=4096");
+    //env.append("SWGCLIENT_MEMORY_SIZE_MB=4096");
 
     qDebug() << "env:" << env;
     process->setEnvironment(env);

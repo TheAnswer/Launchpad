@@ -24,7 +24,7 @@ QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
-const QString MainWindow::version = "0.12";
+const QString MainWindow::version = "0.13";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -275,12 +275,12 @@ int MainWindow::loadAndBasicCheckFiles(QString swgFolder) {
 
 QFile* MainWindow::getRequiredFilesFile() {
     QSettings settings;
-    QString folder = settings.value("swg_folder").toString();
+    //QString folder = settings.value("swg_folder").toString();
 
     QFile* file = NULL;
 
-    if (QDir(folder).exists()) {
-        file = new QFile(folder + "/required2.txt");
+    //if (QDir(folder).exists()) {
+        file = new QFile("required2.txt");
 
         if (file->exists()) {
             if (file->open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -290,7 +290,7 @@ QFile* MainWindow::getRequiredFilesFile() {
         } else {
             delete file;
         }
-    }
+    //}
 
     file = new QFile(":/files/required2.txt");
     file->open(QIODevice::ReadOnly | QIODevice::Text);
@@ -558,10 +558,10 @@ void MainWindow::requiredFileDownloadFileFinished(QNetworkReply* reply) {
   //  qDebug() << data;
 
     QSettings settings;
-    QString folder = settings.value("swg_folder").toString();
+   // QString folder = settings.value("swg_folder").toString();
 
-    if (QDir(folder).exists()) {
-        QFile file(folder + "/" + "required2.txt");
+   // if (QDir(folder).exists()) {
+        QFile file("required2.txt");
 
         if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QTextStream stream(&file);
@@ -572,7 +572,7 @@ void MainWindow::requiredFileDownloadFileFinished(QNetworkReply* reply) {
 
             return;
         }
-    }
+    //}
 
     startLoadBasicCheck();
 
@@ -625,7 +625,9 @@ void MainWindow::startFullScan(bool forceConfigRestore) {
 
     QSettings settings;
     QString folder = settings.value("swg_folder").toString();
-    if (!QDir(folder).exists() || folder.isEmpty()) {
+    QDir checkDir(folder);
+
+    if (!checkDir.exists() || folder.isEmpty() || checkDir.count() < 5) {
         QMessageBox::warning(this, "ERROR", "Invalid game folder!");
 
         return;
