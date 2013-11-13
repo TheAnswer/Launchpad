@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>logo_yellow.png</file>
+        <file>cogs.svg</file>
+        <file>search.svg</file>
+        <file>play.svg</file>
+        <file>logo-emu.svg</file>
+        <file>swgemu.svg</file>
+        <file>emu.ico</file>
+    </qresource>
+    <qresource prefix="/files">
+        <file>required2.txt</file>
+        <file>required.txt</file>
+    </qresource>
+</RCC>
