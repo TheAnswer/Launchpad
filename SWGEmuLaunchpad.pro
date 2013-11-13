@@ -50,7 +50,9 @@ OTHER_FILES += \
     search.svg \
     play.svg \
     logo-emu.svg \
-    cogs.svg
+    cogs.svg \
+    required2.txt \
+    required.txt
 
 RESOURCES += \
     rsources.qrc

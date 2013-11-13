@@ -1,0 +1,4 @@
+swgemu.cfg
+swgemu_login.cfg
+swgemu_preload.cfg
+swgemu_live.cfg
