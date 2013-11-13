@@ -152,6 +152,11 @@ int InstallFromSWG::installFiles() {
     if (QDir(emuFolder).exists()) {
         if (QMessageBox::question(this, "Warning", "SWGEmu folder already exists, do you want to overwrite?") != QMessageBox::Yes)
             return 3;
+    } else {
+        if (!QDir(emuFolder).mkpath(".")) {
+            QMessageBox::warning(this, "ERROR", "Could not create the swgemu folder!");
+            return 4;
+        }
     }
 
     QVector<QPair<QString, qint64> > requiredFiles = MainWindow::getRequiredFiles();
