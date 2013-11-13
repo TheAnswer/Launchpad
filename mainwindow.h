@@ -42,7 +42,7 @@ public slots:
   void loadFinished();
   //void fullScanFinished();
   void startLoadBasicCheck();
-  void startFullScan();
+  void startFullScan(bool forceConfigRestore = false);
   static QVector<QPair<QString, qint64> > getRequiredFiles();
   void downloadFinished();
   void downloadFileFinished(QNetworkReply *reply);
@@ -74,6 +74,8 @@ public slots:
   void addFileToDownloadSlot(QString file); 
   int fullScanSingleThreaded(bool restoreConfigFiles);
   void fullScanMultiThreaded(bool restoreConfigFiles);
+
+  void installSWGEmu();
 
 
 signals:

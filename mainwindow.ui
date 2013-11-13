@@ -402,6 +402,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="actionFolders"/>
     <addaction name="actionLogin_Servers"/>
+    <addaction name="actionInstall_from_SWG"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -484,6 +485,11 @@ p, li { white-space: pre-wrap; }
   <action name="actionDelete_Profiles">
    <property name="text">
     <string>Delete Profiles</string>
+   </property>
+  </action>
+  <action name="actionInstall_from_SWG">
+   <property name="text">
+    <string>Install from SWG</string>
    </property>
   </action>
  </widget>

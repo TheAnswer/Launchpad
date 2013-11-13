@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     configparser.cpp \
     gameprocess.cpp \
     windebugmonitor.cpp \
-    selfupdater.cpp
+    selfupdater.cpp \
+    installfromswg.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -33,14 +34,16 @@ HEADERS  += mainwindow.h \
     gameprocess.h \
     windebugmonitor.h \
     selfupdater.h \
-    singleinstance.h
+    singleinstance.h \
+    installfromswg.h
 
 FORMS    += mainwindow.ui \
     settings.ui \
     loginservers.ui \
     addloginserver.ui \
     gameprocess.ui \
-    selfupdater.ui
+    selfupdater.ui \
+    installfromswg.ui
 
 OTHER_FILES += \
     logo_yellow.png \

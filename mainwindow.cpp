@@ -14,6 +14,7 @@
 #include "windebugmonitor.h"
 #include "selfupdater.h"
 #include <QCloseEvent>
+#include "installfromswg.h"
 
 #if QT_VERSION >= 0x050000
 #include <QtConcurrent/QtConcurrentRun>
@@ -23,7 +24,7 @@ QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
-const QString MainWindow::version = "0.11";
+const QString MainWindow::version = "0.12";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -74,6 +75,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     connect(ui->actionDelete_Profiles, SIGNAL(triggered()), this, SLOT(deleteProfiles()));
     connect(this, SIGNAL(addFileToDownload(QString)), this, SLOT(addFileToDownloadSlot(QString)));
+    connect(ui->actionInstall_from_SWG, SIGNAL(triggered()), this, SLOT(installSWGEmu()));
+
     ui->groupBox_browser->hide();
 
     QTabBar* tabBar = ui->tabWidget->tabBar();
@@ -104,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (!swgFolder.isEmpty())
         startLoadBasicCheck();
     else
-        QMessageBox::warning(this, "Error", "Please set the swg folder in Settings->Options");
+        QMessageBox::warning(this, "Error", "Please set the swgemu folder in Settings->Options or install using Settings->Install From SWG");
 
     requiredFilesNetworkManager.get(QNetworkRequest(QUrl(patchUrl + "required2.txt")));
 }
@@ -616,7 +619,7 @@ void MainWindow::updateFullScanProgress(QString successFile, bool success) {
     }
 }
 
-void MainWindow::startFullScan() {
+void MainWindow::startFullScan(bool forceConfigRestore) {
     requiredFilesCount = getRequiredFiles().size();
     currentReadFiles = 0;
 
@@ -628,7 +631,7 @@ void MainWindow::startFullScan() {
         return;
     }
 
-    bool restoreConfigFiles = QMessageBox::question(this, "Config files", "Do you want to restore the config files too?") == QMessageBox::Yes;
+    bool restoreConfigFiles = forceConfigRestore ? true : QMessageBox::question(this, "Config files", "Do you want to restore the config files too?") == QMessageBox::Yes;
 
     if (requiredFilesCount == 0 && !restoreConfigFiles)
         return;
@@ -1294,5 +1297,19 @@ void MainWindow::closeTab(int index) {
         widget->clearOutputLogScreen();
         widget->deleteLater();
         //delete widget;
+    }
+}
+
+void MainWindow::installSWGEmu() {
+    InstallFromSWG installation(this);
+    int result = installation.installFiles();
+
+    if (result == 0) {
+        QSettings settingsVals;
+        settingsVals.setValue("swg_folder", installation.getEmuFolder());
+
+        settings->restoreFolder();
+
+        startFullScan(true);
     }
 }
