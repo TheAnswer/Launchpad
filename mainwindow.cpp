@@ -24,7 +24,7 @@ QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
-const QString MainWindow::version = "0.13";
+const QString MainWindow::version = "0.14";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -853,12 +853,17 @@ void MainWindow::downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
 
 void MainWindow::startSWGSetup() {
     //QMessageBox::
-    QProcess* process = new QProcess();
+    //QProcess* process = new QProcess();
     QSettings settings;
     QString folder = settings.value("swg_folder").toString();
 
-    process->setWorkingDirectory(folder);
-    process->start(folder + "\\" + "SWGEmu_Setup.exe");
+    //qDebug() << folder;
+    /*process->setWorkingDirectory(folder);
+    process->start(folder + "\\" + "SWGEmu_Setup.exe");*/
+
+    if (!QProcess::startDetached(folder + "\\" + "SWGEmu_Setup.exe", QStringList(), folder)) {
+        QMessageBox::warning(this, "ERROR", "Could not launch game settings!");
+    }
 }
 
 void MainWindow::downloadFinished() {
