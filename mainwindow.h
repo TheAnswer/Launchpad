@@ -77,7 +77,6 @@ public slots:
 
   void installSWGEmu();
 
-
 signals:
   void startDownload();
   void requiredFileExists(QString);

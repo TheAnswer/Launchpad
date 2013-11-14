@@ -28,6 +28,8 @@ DWORD WinDebugMonitor::Initialize()
 
     if (m_hDBWinMutex == NULL) {
         errorCode = GetLastError();
+
+        emit outputDebugString(-1, "Failed to create DBWinMutex");
         return errorCode;
     }
 
@@ -50,6 +52,8 @@ DWORD WinDebugMonitor::Initialize()
 
         if (m_hEventBufferReady == NULL) {
             errorCode = GetLastError();
+
+            emit outputDebugString(-1, "Failed to create m_hEventBufferReady");
             return errorCode;
         }
     }
@@ -73,6 +77,8 @@ DWORD WinDebugMonitor::Initialize()
 
         if (m_hEventDataReady == NULL) {
             errorCode = GetLastError();
+
+            emit outputDebugString(-1, "Failed to create m_hEventDataReady");
             return errorCode;
         }
     }
@@ -98,6 +104,8 @@ DWORD WinDebugMonitor::Initialize()
 
         if (m_hDBMonBuffer == NULL) {
             errorCode = GetLastError();
+
+            emit outputDebugString(-1, "Failed to create m_hDBMonBuffer");
             return errorCode;
         }
     }
@@ -112,6 +120,8 @@ DWORD WinDebugMonitor::Initialize()
 
     if (m_pDBBuffer == NULL) {
         errorCode = GetLastError();
+
+        emit outputDebugString(-1, "Failed to create m_pDBBuffer");
         return errorCode;
     }
 
@@ -131,6 +141,8 @@ DWORD WinDebugMonitor::Initialize()
     if (m_hWinDebugMonitorThread == NULL) {
         m_bWinDebugMonStopped = TRUE;
         errorCode = GetLastError();
+
+        emit outputDebugString(-1, "Failed to create m_hWinDebugMonitorThread");
         return errorCode;
     }
 

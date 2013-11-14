@@ -7,6 +7,18 @@
         <file>logo-emu.svg</file>
         <file>swgemu.svg</file>
         <file>emu.ico</file>
+        <file>info.svg</file>
+        <file>cloud.svg</file>
+        <file>installfromswg.svg</file>
+        <file>game_settings.svg</file>
+        <file>cloud_down.svg</file>
+        <file>globe.svg</file>
+        <file>update_status.svg</file>
+        <file>bin.svg</file>
+        <file>house.svg</file>
+        <file>console.svg</file>
+        <file>tab.svg</file>
+        <file>play2.svg</file>
     </qresource>
     <qresource prefix="/files">
         <file>required2.txt</file>

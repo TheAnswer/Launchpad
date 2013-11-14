@@ -9,6 +9,7 @@
 #include "configparser.h"
 #include <QScrollBar>
 #include <QDateTime>
+#include <QFileDialog>
 
 WinDebugMonitor* GameProcess::debugMonitor = NULL;
 
@@ -21,11 +22,36 @@ GameProcess::GameProcess(ConfigParser* config, QWidget *parent) :
     configParser = config;
     connect(ui->pushButton_config, SIGNAL(clicked()), this, SLOT(dumpConfigValues()));
     connect(ui->pushButton_kill, SIGNAL(clicked()), this, SLOT(killProcess()));
+    connect(ui->pushButton_save, SIGNAL(clicked()), this, SLOT(saveLogToFile()));
+    connect(ui->pushButton_clean, SIGNAL(clicked()), this, SLOT(clearOutputLogScreen()));
 }
 
 GameProcess::~GameProcess() {
     delete ui;
     delete configParser;
+}
+
+void GameProcess::saveLogToFile() {
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Log"),
+                               "/home/log.txt",
+                               tr("Text files (*.txt)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    QFile file(fileName);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "ERROR", "Could not save file!");
+
+        return;
+    }
+
+    QTextStream stream(&file);
+
+    stream << ui->textBrowser->toPlainText();
+
+    file.close();
 }
 
 bool GameProcess::start(const QString& folder, const QString& executable, const QStringList &arguments) {
@@ -37,6 +63,8 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
     if (debugMonitor == NULL) {
         debugMonitor = new WinDebugMonitor();
     }
+
+    connect(debugMonitor, SIGNAL(outputDebugString(int, QString)), this, SLOT(outputDebugString(int, QString)));
 
     if (!settings.value("close_after_start", false).toBool() && !debugMonitor->IsInitialized() && settings.value("capture_debug_output", false).toBool()) {
         int ret = debugMonitor->Initialize();
@@ -51,14 +79,13 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
     }
 
     connect(process, SIGNAL(error(QProcess::ProcessError)), this, SLOT(startError(QProcess::ProcessError)));
-    connect(debugMonitor, SIGNAL(outputDebugString(int, QString)), this, SLOT(outputDebugString(int, QString)));
     connect(process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
     connect(process, SIGNAL(started()), this, SLOT(started()));
 
-    QStringList env = process->environment();
+    QStringList env = QProcess::systemEnvironment();
     //env.append("SWGCLIENT_MEMORY_SIZE_MB=4096");
 
-    qDebug() << "env:" << env;
+    //qDebug() << "env:" << env;
     process->setEnvironment(env);
     process->start(folder + "\\" + executable, arguments);
     return true;
@@ -127,7 +154,7 @@ void GameProcess::outputDebugString(int processId, QString str) {
     //QDateTime currentStamp = ;
 
     QString date = QDateTime::currentDateTime().toString("hh:mm:ss");
-    if (process && process->pid()->dwProcessId == processId) {
+    if (processId < 0 || (process && process->pid()->dwProcessId == processId)) {
         ui->textBrowser->append(date + ": " + str);
     }
 }

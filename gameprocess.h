@@ -31,7 +31,7 @@ public slots:
     void started();
     void dumpConfigValues();
     void killProcess();
-
+    void saveLogToFile();
     void clearOutputLogScreen();
 
 signals:

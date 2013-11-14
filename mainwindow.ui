@@ -10,6 +10,9 @@
     <height>479</height>
    </rect>
   </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::NoContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>SWGEmu Launchpad</string>
   </property>
@@ -30,6 +33,10 @@
        <bool>true</bool>
       </property>
       <widget class="QWidget" name="tab">
+       <attribute name="icon">
+        <iconset resource="rsources.qrc">
+         <normaloff>:/img/console.svg</normaloff>:/img/console.svg</iconset>
+       </attribute>
        <attribute name="title">
         <string>Main</string>
        </attribute>
@@ -414,8 +421,11 @@ p, li { white-space: pre-wrap; }
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="contextMenuPolicy">
+    <enum>Qt::DefaultContextMenu</enum>
+   </property>
    <property name="movable">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -453,41 +463,76 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="actionLogin_Servers">
+   <property name="icon">
+    <iconset resource="rsources.qrc">
+     <normaloff>:/img/house.svg</normaloff>:/img/house.svg</iconset>
+   </property>
    <property name="text">
     <string>Login Servers</string>
    </property>
   </action>
   <action name="actionShow_news">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="rsources.qrc">
+     <normaloff>:/img/globe.svg</normaloff>:/img/globe.svg</iconset>
+   </property>
    <property name="text">
     <string>Show news</string>
    </property>
   </action>
   <action name="actionUpdate_Status">
+   <property name="icon">
+    <iconset resource="rsources.qrc">
+     <normaloff>:/img/update_status.svg</normaloff>:/img/update_status.svg</iconset>
+   </property>
    <property name="text">
     <string>Update Status</string>
    </property>
   </action>
   <action name="actionCheck_for_updates">
+   <property name="icon">
+    <iconset resource="rsources.qrc">
+     <normaloff>:/img/cloud_down.svg</normaloff>:/img/cloud_down.svg</iconset>
+   </property>
    <property name="text">
     <string>Check for updates</string>
    </property>
   </action>
   <action name="actionGame_Settings">
+   <property name="icon">
+    <iconset resource="rsources.qrc">
+     <normaloff>:/img/game_settings.svg</normaloff>:/img/game_settings.svg</iconset>
+   </property>
    <property name="text">
     <string>Game Settings</string>
    </property>
   </action>
   <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="rsources.qrc">
+     <normaloff>:/img/info.svg</normaloff>:/img/info.svg</iconset>
+   </property>
    <property name="text">
     <string>About</string>
    </property>
   </action>
   <action name="actionDelete_Profiles">
+   <property name="icon">
+    <iconset resource="rsources.qrc">
+     <normaloff>:/img/bin.svg</normaloff>:/img/bin.svg</iconset>
+   </property>
    <property name="text">
     <string>Delete Profiles</string>
    </property>
   </action>
   <action name="actionInstall_from_SWG">
+   <property name="icon">
+    <iconset resource="rsources.qrc">
+     <normaloff>:/img/installfromswg.svg</normaloff>:/img/installfromswg.svg</iconset>
+   </property>
    <property name="text">
     <string>Install from SWG</string>
    </property>

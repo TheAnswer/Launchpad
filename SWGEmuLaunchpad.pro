@@ -55,7 +55,8 @@ OTHER_FILES += \
     logo-emu.svg \
     cogs.svg \
     required2.txt \
-    required.txt
+    required.txt \
+    info.svg
 
 RESOURCES += \
     rsources.qrc

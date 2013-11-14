@@ -24,7 +24,7 @@ QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
-const QString MainWindow::version = "0.14";
+const QString MainWindow::version = "0.15";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -102,14 +102,17 @@ MainWindow::MainWindow(QWidget *parent) :
     updateLoginServerList();
 
     silentSelfUpdater = new SelfUpdater(true, this);
-    silentSelfUpdater->silentCheck();
 
     if (!swgFolder.isEmpty())
         startLoadBasicCheck();
     else
         QMessageBox::warning(this, "Error", "Please set the swgemu folder in Settings->Options or install using Settings->Install From SWG");
 
+    restoreGeometry(settingsOptions.value("mainWindowGeometry").toByteArray());
+    restoreState(settingsOptions.value("mainWindowState").toByteArray());
+
     requiredFilesNetworkManager.get(QNetworkRequest(QUrl(patchUrl + "required2.txt")));
+    silentSelfUpdater->silentCheck();
 }
 
 MainWindow::~MainWindow() {
@@ -234,6 +237,7 @@ void MainWindow::triggerNews() {
         }
 
         ui->actionShow_news->setText("Hide news");
+        //ui->actionShow_news->setChecked(true);
         ui->groupBox_browser->show();
     } else {
         ui->groupBox_browser->hide();
@@ -241,6 +245,7 @@ void MainWindow::triggerNews() {
         if (!isMaximized())
             this->resize(907, 256);
 
+        //ui->actionShow_news->setChecked(false);
         ui->actionShow_news->setText("Show news");
     }
 }
@@ -1153,6 +1158,7 @@ void MainWindow::startSWG() {
     QTabBar* bar = ui->tabWidget->tabBar();
     int tabIndex = ui->tabWidget->indexOf(process);
     bar->setTabTextColor(tabIndex, Qt::green);
+    bar->setTabIcon(tabIndex, QIcon(":/img/tab.svg"));
 
     //process->show();
     bool startResult = process->start(folder, gameExecutable, arguments);
@@ -1280,6 +1286,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 
     ui->statusBar->showMessage("Threads canceled.");
+
+    QSettings settings;
+    settings.setValue("mainWindowGeometry", saveGeometry());
+    settings.setValue("mainWindowState", saveState());
 
     QMainWindow::closeEvent(event);
 }
