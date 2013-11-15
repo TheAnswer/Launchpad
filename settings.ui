@@ -22,7 +22,7 @@
         <enum>Qt::LeftToRight</enum>
        </property>
        <property name="text">
-        <string>Close after game starts</string>
+        <string>Close after the game starts</string>
        </property>
       </widget>
      </item>
@@ -40,7 +40,7 @@
      <item row="0" column="0">
       <widget class="QCheckBox" name="checkBox_minimize">
        <property name="text">
-        <string>Hide to tray after game starts</string>
+        <string>Hide to tray after the game starts</string>
        </property>
       </widget>
      </item>
