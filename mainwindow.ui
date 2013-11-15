@@ -436,11 +436,6 @@ p, li { white-space: pre-wrap; }
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionShow_news"/>
-   <addaction name="actionUpdate_Status"/>
-   <addaction name="actionGame_Settings"/>
-   <addaction name="actionDelete_Profiles"/>
-   <addaction name="actionCheck_for_updates"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionClient_Folders">

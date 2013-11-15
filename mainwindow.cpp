@@ -24,7 +24,7 @@ QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
-const QString MainWindow::version = "0.15";
+const QString MainWindow::version = "0.16";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -51,8 +51,50 @@ MainWindow::MainWindow(QWidget *parent) :
     systemTrayMenu->addAction(closeAction);
     systemTrayIcon->setContextMenu(systemTrayMenu);
 
+    QToolButton* newsButton = new QToolButton(ui->mainToolBar);
+    newsButton->setIcon(QIcon(":/img/globe.svg"));
+    newsButton->setText("News");
+    newsButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    newsButton->setCheckable(true);
+    ui->mainToolBar->addWidget(newsButton);
+    connect(newsButton, SIGNAL(clicked()), this, SLOT(triggerNews()));
+    toolButtons.append(newsButton);
+
+    QToolButton* updateStatusButton = new QToolButton(ui->mainToolBar);
+    updateStatusButton->setIcon(QIcon(":/img/update_status.svg"));
+    updateStatusButton->setText("Update status");
+    updateStatusButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->mainToolBar->addWidget(updateStatusButton);
+    connect(updateStatusButton, SIGNAL(clicked()), this, SLOT(updateServerStatus()));
+    toolButtons.append(updateStatusButton);
+
+    QToolButton* gameSettingsButton = new QToolButton(ui->mainToolBar);
+    gameSettingsButton->setIcon(QIcon(":/img/game_settings.svg"));
+    gameSettingsButton->setText("Game settings");
+    gameSettingsButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->mainToolBar->addWidget(gameSettingsButton);
+    connect(gameSettingsButton, SIGNAL(clicked()), this, SLOT(startSWGSetup()));
+    toolButtons.append(gameSettingsButton);
+
+    QToolButton* deleteProfilesButton = new QToolButton(ui->mainToolBar);
+    deleteProfilesButton->setIcon(QIcon(":/img/bin.svg"));
+    deleteProfilesButton->setText("Delete game profiles");
+    deleteProfilesButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->mainToolBar->addWidget(deleteProfilesButton);
+    connect(deleteProfilesButton, SIGNAL(clicked()), this, SLOT(deleteProfiles()));
+    toolButtons.append(deleteProfilesButton);
+
+    QToolButton* updateButton = new QToolButton(ui->mainToolBar);
+    updateButton->setIcon(QIcon(":/img/cloud_down.svg"));
+    updateButton->setText("Check for updates");
+    updateButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->mainToolBar->addWidget(updateButton);
+    connect(updateButton, SIGNAL(clicked()), this, SLOT(checkForUpdates()));
+    toolButtons.append(updateButton);
+
     cancelWorkingThreads = false;
 
+    connect(ui->mainToolBar, SIGNAL(orientationChanged(Qt::Orientation)), this, SLOT(toolBarOrientationChanged(Qt::Orientation)));
     connect(systemTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(systemTrayActivated(QSystemTrayIcon::ActivationReason)));
     connect(closeAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(ui->actionFolders, SIGNAL(triggered()), this, SLOT(showSettings()));
@@ -111,6 +153,16 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreGeometry(settingsOptions.value("mainWindowGeometry").toByteArray());
     restoreState(settingsOptions.value("mainWindowState").toByteArray());
 
+    QString savedLogin = settingsOptions.value("selected_login_server", "").toString();
+
+    if (!savedLogin.isEmpty()) {
+        int idx = ui->comboBox_login->findText(savedLogin);
+
+        if (idx >= 0) {
+            ui->comboBox_login->setCurrentIndex(idx);
+        }
+    }
+
     requiredFilesNetworkManager.get(QNetworkRequest(QUrl(patchUrl + "required2.txt")));
     silentSelfUpdater->silentCheck();
 }
@@ -139,6 +191,28 @@ MainWindow::~MainWindow() {
 
     delete silentSelfUpdater;
     silentSelfUpdater = NULL;
+}
+
+void MainWindow::toolBarOrientationChanged(Qt::Orientation orientation) {
+    /*
+    Qt::ToolButtonStyle style = Qt::ToolButtonTextBesideIcon;
+
+    switch (orientation) {
+    case Qt::Horizontal:
+        style = Qt::ToolButtonTextBesideIcon;
+        break;
+    case Qt::Vertical:
+        style = Qt::ToolButtonTextUnderIcon;
+        break;
+    }
+
+    for (int i = 0; i < toolButtons.size(); ++i) {
+        QToolButton* button = toolButtons.at(i);
+        button->setToolButtonStyle(style);
+        button->set
+//        button->set
+    }
+    */
 }
 
 void MainWindow::systemTrayActivated(QSystemTrayIcon::ActivationReason reason) {
@@ -1290,6 +1364,9 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     QSettings settings;
     settings.setValue("mainWindowGeometry", saveGeometry());
     settings.setValue("mainWindowState", saveState());
+
+    QString currentLogin = ui->comboBox_login->currentText();
+    settings.setValue("selected_login_server", currentLogin);
 
     QMainWindow::closeEvent(event);
 }

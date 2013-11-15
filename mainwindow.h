@@ -11,6 +11,7 @@
 #include <QFile>
 #include <QSystemTrayIcon>
 #include <QAtomicInt>
+#include <QToolButton>
 
 class Settings;
 class LoginServers;
@@ -75,6 +76,8 @@ public slots:
   int fullScanSingleThreaded(bool restoreConfigFiles);
   void fullScanMultiThreaded(bool restoreConfigFiles);
 
+  void toolBarOrientationChanged(Qt::Orientation orientation);
+
   void installSWGEmu();
 
 signals:
@@ -112,6 +115,8 @@ private:
   int gameProcessesCount;
 
   QAtomicInt fullScanWorkingThreads;
+
+  QVector<QToolButton*> toolButtons;
 
 };
 
