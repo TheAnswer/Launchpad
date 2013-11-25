@@ -24,7 +24,7 @@ QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
-const QString MainWindow::version = "0.16";
+const QString MainWindow::version = "0.17";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     settings = new Settings(this);
     loginServers = new LoginServers(this);
-    systemTrayIcon = new QSystemTrayIcon(this);
+    systemTrayIcon = new QSystemTrayIcon();
     systemTrayIcon->setIcon(QIcon(":/img/swgemu.svg"));
     systemTrayMenu = new QMenu();
     closeAction = new QAction("Close", this);
@@ -1014,7 +1014,7 @@ QVector<QPair<QString, qint64> > MainWindow::getRequiredFiles() {
     //QStringList files;
 
     if (QDir(folder).exists()) {
-        QFile file(folder + "/required2.txt");
+        QFile file("required2.txt");
 
         if (file.exists()) {
             if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {

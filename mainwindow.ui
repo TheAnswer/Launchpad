@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>907</width>
-    <height>479</height>
+    <width>944</width>
+    <height>502</height>
    </rect>
   </property>
   <property name="contextMenuPolicy">
@@ -396,7 +396,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>907</width>
+     <width>944</width>
      <height>21</height>
     </rect>
    </property>
