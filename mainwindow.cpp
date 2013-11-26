@@ -633,7 +633,7 @@ void MainWindow::showAboutDialog() {
 
 void MainWindow::requiredFileDownloadFileFinished(QNetworkReply* reply) {
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(this, "ERROR getting new patch information", reply->errorString());
+       // QMessageBox::warning(this, "ERROR getting new patch information", reply->errorString());
 
         return;
     }
