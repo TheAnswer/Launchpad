@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QToolButton* profCalculatorButton = new QToolButton(ui->mainToolBar);
     profCalculatorButton->setIcon(QIcon(":/img/design.svg"));
-    profCalculatorButton->setText("Start Profession Calculator");
+    profCalculatorButton->setText("Profession Calculator");
     profCalculatorButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     ui->mainToolBar->addWidget(profCalculatorButton);
     connect(profCalculatorButton, SIGNAL(clicked()), this, SLOT(startKodanCalculator()));
