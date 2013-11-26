@@ -36,6 +36,14 @@ public:
     setText(s.text());
   }
 
+  void setHost(const QString& host) {
+      this->host = host;
+  }
+
+  void setPort(unsigned short port) {
+      this->port = port;
+  }
+
   QString getHost() {
     return host;
   }

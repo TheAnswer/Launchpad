@@ -18,6 +18,12 @@ public:
   QString getName();
   QString getHost();
   quint16 getPort();
+
+  void setName(const QString& name);
+  void setHost(const QString& host);
+  void setPort(quint16 port);
+
+  void disableNameEdit();
   
 private:
   Ui::AddLoginServer *ui;

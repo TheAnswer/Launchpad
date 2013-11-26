@@ -141,7 +141,7 @@ int InstallFromSWG::installFiles() {
                                                     | QFileDialog::DontResolveSymlinks);
 
     if (!QDir(emuFolder).exists() || emuFolder.isEmpty()) {
-        QMessageBox::warning(this, "Folder", "The swgemu folder you selected isnt a valid directory");
+        QMessageBox::warning(this, "Folder", "The swgemu folder you selected isn't a valid directory");
 
         return 1;
     }

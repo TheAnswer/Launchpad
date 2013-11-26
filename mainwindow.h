@@ -71,13 +71,13 @@ public slots:
   void systemTrayActivated(QSystemTrayIcon::ActivationReason reason);
   void deleteProfiles();
 
-  void fullScanFile(const QString& file, const QString& name, qint64 size, const QString &md5);
+  void fullScanFile(const QString& file, const QString& name, qint64, const QString &md5);
   void addFileToDownloadSlot(QString file); 
-  int fullScanSingleThreaded(bool restoreConfigFiles);
-  void fullScanMultiThreaded(bool restoreConfigFiles);
+  int fullScanSingleThreaded(bool);
+  void fullScanMultiThreaded(bool);
 
-  void toolBarOrientationChanged(Qt::Orientation orientation);
-
+  void toolBarOrientationChanged(Qt::Orientation);
+  void startKodanCalculator();
   void installSWGEmu();
 
 signals:

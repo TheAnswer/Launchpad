@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "loginserver.h"
+#include "addloginserver.h"
 
 namespace Ui {
   class LoginServers;
@@ -25,10 +26,13 @@ public:
   int count();
   LoginServer* getServer(int index);
 
+  bool checkServerDialog(AddLoginServer& dialog);
+
 public slots:
   void addServer();
   void removeServer();
   void reloadServers();
+  void editServer();
   
 private:
   Ui::LoginServers *ui;

@@ -24,7 +24,7 @@ QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
-const QString MainWindow::version = "0.17";
+const QString MainWindow::version = "0.18";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -44,10 +44,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     settings = new Settings(this);
     loginServers = new LoginServers(this);
-    systemTrayIcon = new QSystemTrayIcon();
+    systemTrayIcon = new QSystemTrayIcon(this);
     systemTrayIcon->setIcon(QIcon(":/img/swgemu.svg"));
     systemTrayMenu = new QMenu();
-    closeAction = new QAction("Close", this);
+    closeAction = new QAction("Close", NULL);
     systemTrayMenu->addAction(closeAction);
     systemTrayIcon->setContextMenu(systemTrayMenu);
 
@@ -75,6 +75,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addWidget(gameSettingsButton);
     connect(gameSettingsButton, SIGNAL(clicked()), this, SLOT(startSWGSetup()));
     toolButtons.append(gameSettingsButton);
+
+    QToolButton* profCalculatorButton = new QToolButton(ui->mainToolBar);
+    profCalculatorButton->setIcon(QIcon(":/img/design.svg"));
+    profCalculatorButton->setText("Start Profession Calculator");
+    profCalculatorButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->mainToolBar->addWidget(profCalculatorButton);
+    connect(profCalculatorButton, SIGNAL(clicked()), this, SLOT(startKodanCalculator()));
+    toolButtons.append(profCalculatorButton);
 
     QToolButton* deleteProfilesButton = new QToolButton(ui->mainToolBar);
     deleteProfilesButton->setIcon(QIcon(":/img/bin.svg"));
@@ -193,7 +201,7 @@ MainWindow::~MainWindow() {
     silentSelfUpdater = NULL;
 }
 
-void MainWindow::toolBarOrientationChanged(Qt::Orientation orientation) {
+void MainWindow::toolBarOrientationChanged(Qt::Orientation ) {
     /*
     Qt::ToolButtonStyle style = Qt::ToolButtonTextBesideIcon;
 
@@ -377,7 +385,7 @@ QFile* MainWindow::getRequiredFilesFile() {
     return file;
 }
 
-int MainWindow::fullScanSingleThreaded(bool restoreConfigFiles) {
+int MainWindow::fullScanSingleThreaded(bool ) {
     QFile* file = getRequiredFilesFile();
 
     QSettings settings;
@@ -462,7 +470,7 @@ int MainWindow::fullScanSingleThreaded(bool restoreConfigFiles) {
     return res;
 }
 
-void  MainWindow::fullScanMultiThreaded(bool restoreConfigFiles) {
+void  MainWindow::fullScanMultiThreaded(bool ) {
     QFile* file = getRequiredFilesFile();
 
     QSettings settings;
@@ -549,7 +557,7 @@ void  MainWindow::fullScanMultiThreaded(bool restoreConfigFiles) {
     delete file;
 }
 
-void MainWindow::fullScanFile(const QString& file, const QString &name, qint64 size, const QString& md5) {
+void MainWindow::fullScanFile(const QString& file, const QString &name, qint64 , const QString& md5) {
     QFile fileObject(file);
 
     if (!fileObject.exists()) {
@@ -706,7 +714,7 @@ void MainWindow::startFullScan(bool forceConfigRestore) {
     QString folder = settings.value("swg_folder").toString();
     QDir checkDir(folder);
 
-    if (!checkDir.exists() || folder.isEmpty() || checkDir.count() < 5) {
+    if (!checkDir.exists() || folder.isEmpty() || checkDir.count() < 15) {
         QMessageBox::warning(this, "ERROR", "Invalid game folder!");
 
         return;
@@ -928,6 +936,12 @@ void MainWindow::downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
 
     lastReceivedBytesTime.restart();
     lastReceivedBytes = bytesReceived;
+}
+
+void MainWindow::startKodanCalculator() {
+    if (!QProcess::startDetached("KSWGProfCalcEditor.exe", QStringList(), QDir::currentPath())) {
+        QMessageBox::warning(this, "ERROR", "Could not launch profession calculator!");
+    }
 }
 
 void MainWindow::startSWGSetup() {
@@ -1307,9 +1321,9 @@ void MainWindow::statusXmlIsReady(QNetworkReply* reply) {
         qint64 days = uptimeSeconds / 86400;
 
         if (days != 0) {
-            uptimeStream << days << (days == 1 ? " day " : " days ") << hours << (hours == 1 ? "hour " : " hours ") << minutes << (minutes == 1 ? "minute " : " minutes");
+            uptimeStream << days << (days == 1 ? " day " : " days ") << hours << (hours == 1 ? " hour " : " hours ") << minutes << (minutes == 1 ? " minute " : " minutes");
         } else if (hours != 0) {
-            uptimeStream << hours << (hours == 1 ? " hour " : " hours ") << minutes << (minutes == 1 ? "minute " : " minutes");
+            uptimeStream << hours << (hours == 1 ? " hour " : " hours ") << minutes << (minutes == 1 ? " minute " : " minutes");
         } else {
             uptimeStream << minutes << (minutes == 1 ? " minute " : " minutes") << uptimeSeconds % 60 << " seconds";
         }

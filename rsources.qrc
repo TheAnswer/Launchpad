@@ -19,6 +19,7 @@
         <file>console.svg</file>
         <file>tab.svg</file>
         <file>play2.svg</file>
+        <file>design.svg</file>
     </qresource>
     <qresource prefix="/files">
         <file>required2.txt</file>
