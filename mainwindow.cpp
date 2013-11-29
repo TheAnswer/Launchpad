@@ -28,7 +28,7 @@ QString MainWindow::gameExecutable = "SWGEmu.exe";
 #ifdef Q_OS_WIN32
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
 #else
-QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux.cfg";
+QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux86_64.cfg";
 #endif
 const QString MainWindow::version = "0.18";
 
@@ -947,9 +947,31 @@ void MainWindow::downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
 }
 
 void MainWindow::startKodanCalculator() {
+    #ifdef Q_OS_WIN32
     if (!QProcess::startDetached("KSWGProfCalcEditor.exe", QStringList(), QDir::currentPath())) {
         QMessageBox::warning(this, "ERROR", "Could not launch profession calculator!");
     }
+    #else
+    QSettings settings;
+    QString wineBinary = settings.value("wine_binary").toString();
+
+    if (wineBinary.isEmpty())
+        wineBinary = "wine";
+
+    QString args = settings.value("wine_args").toString();
+
+    QStringList argsList;
+    if (!args.isEmpty())
+        argsList = args.split(" ");
+
+    argsList.append("KSWGProfCalcEditor.exe");
+
+    qDebug() << argsList;
+
+    if (!QProcess::startDetached(wineBinary, argsList, QDir::currentPath())) {
+        QMessageBox::warning(this, "ERROR", "Could not launch game settings!");
+    }
+    #endif
 }
 
 void MainWindow::startSWGSetup() {
@@ -958,6 +980,8 @@ void MainWindow::startSWGSetup() {
     QSettings settings;
     QString folder = settings.value("swg_folder").toString();
 
+#ifdef Q_OS_WIN32
+
     //qDebug() << folder;
     /*process->setWorkingDirectory(folder);
     process->start(folder + "\\" + "SWGEmu_Setup.exe");*/
@@ -965,6 +989,26 @@ void MainWindow::startSWGSetup() {
     if (!QProcess::startDetached(folder + "\\" + "SWGEmu_Setup.exe", QStringList(), folder)) {
         QMessageBox::warning(this, "ERROR", "Could not launch game settings!");
     }
+#else
+    QString wineBinary = settings.value("wine_binary").toString();
+
+    if (wineBinary.isEmpty())
+        wineBinary = "wine";
+
+    QString args = settings.value("wine_args").toString();
+
+    QStringList argsList;
+    if (!args.isEmpty())
+        argsList = args.split(" ");
+
+    argsList.append(folder + "\\" + "SWGEmu_Setup.exe");
+
+    qDebug() << argsList;
+
+    if (!QProcess::startDetached(wineBinary, argsList, folder)) {
+        QMessageBox::warning(this, "ERROR", "Could not launch game settings!");
+    }
+#endif
 }
 
 void MainWindow::downloadFinished() {

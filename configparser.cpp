@@ -31,7 +31,12 @@ int ConfigParser::loadFile(const QString& folder, const QString& configFileName)
     QString oldFile = currentFile;
     QString oldFolder = currentFolder;
 
+    //qDebug() << folder + "\\" + configFileName;
+#ifdef Q_OS_WIN32
     QFile fileObject(folder + "\\" + configFileName);
+#else
+    QFile fileObject(folder + "/" + configFileName);
+#endif
 
     if (!fileObject.exists()) {
         //qDebug() << configFileName << " doesnt exist";

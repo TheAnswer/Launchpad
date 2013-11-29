@@ -96,7 +96,28 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
 
     //qDebug() << "env:" << env;
     process->setEnvironment(env);
+#ifdef Q_OS_WIN32
     process->start(folder + "\\" + executable, arguments);
+#else
+    QString wineBinary = settings.value("wine_binary").toString();
+
+    if (wineBinary.isEmpty())
+        wineBinary = "wine";
+
+    QString args = settings.value("wine_args").toString();
+
+    QStringList argsList;
+    if (!args.isEmpty())
+        argsList = args.split(" ");
+
+    argsList.append(folder + "\\" + executable);
+
+    qDebug() << argsList;
+
+    if (!QProcess::startDetached(wineBinary, argsList, folder)) {
+        QMessageBox::warning(this, "ERROR", "Could not launch game settings!");
+    }
+#endif
     return true;
 }
 

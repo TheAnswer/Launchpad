@@ -23,12 +23,16 @@ public slots:
   void updateMinimizeAfterStart();
   void updateCaptureDebugSetting();
   void updateMultiThreadedFullScan();
+  void updateWineBinary();
+  void updateWineArguments();
 
   void restoreCloseAfterStart();
   void restoreMimizeAfterStart();
   void restoreCaptureDebug();
   void restoreMultiThreadedFullScan();
   void restoreFolder();
+  void restoreWineBinary();
+  void restoreWineArgs();
 
   void closeAfterStartChanged(bool state);
   void minimizeToTrayAfterStartChanged(bool state);
