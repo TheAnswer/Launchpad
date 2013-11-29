@@ -5,13 +5,19 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QSettings>
+
+#ifdef Q_OS_WIN32
 #include "windebugmonitor.h"
+#endif
+
 #include "configparser.h"
 #include <QScrollBar>
 #include <QDateTime>
 #include <QFileDialog>
 
+#ifdef Q_OS_WIN32
 WinDebugMonitor* GameProcess::debugMonitor = NULL;
+#endif
 
 GameProcess::GameProcess(ConfigParser* config, QWidget *parent) :
     QDialog(parent),
@@ -60,9 +66,11 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
 
     process->setWorkingDirectory(folder);
 
+    #ifdef Q_OS_WIN32
     if (debugMonitor == NULL) {
         debugMonitor = new WinDebugMonitor();
     }
+
 
     connect(debugMonitor, SIGNAL(outputDebugString(int, QString)), this, SLOT(outputDebugString(int, QString)));
 
@@ -77,6 +85,7 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
         } else
             ui->textBrowser->append("Capture debug output is disabled");
     }
+    #endif
 
     connect(process, SIGNAL(error(QProcess::ProcessError)), this, SLOT(startError(QProcess::ProcessError)));
     connect(process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
@@ -154,9 +163,15 @@ void GameProcess::outputDebugString(int processId, QString str) {
     //QDateTime currentStamp = ;
 
     QString date = QDateTime::currentDateTime().toString("hh:mm:ss");
+    #ifdef Q_OS_WIN32
     if (processId < 0 || (process && process->pid()->dwProcessId == processId)) {
         ui->textBrowser->append(date + ": " + str);
     }
+    #else
+    if (processId < 0 || (process && process->pid() == processId)) {
+        ui->textBrowser->append(date + ": " + str);
+    }
+    #endif
 }
 
 void GameProcess::finished(int exitCode, QProcess::ExitStatus ) {

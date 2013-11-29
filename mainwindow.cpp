@@ -11,7 +11,9 @@
 #include "loginservers.h"
 #include "configparser.h"
 #include "gameprocess.h"
+#ifdef Q_OS_WIN32
 #include "windebugmonitor.h"
+#endif
 #include "selfupdater.h"
 #include <QCloseEvent>
 #include "installfromswg.h"
@@ -23,7 +25,11 @@
 QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
+#ifdef Q_OS_WIN32
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
+#else
+QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux.cfg";
+#endif
 const QString MainWindow::version = "0.18";
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -192,10 +198,12 @@ MainWindow::~MainWindow() {
         delete process;
     }
 
+    #ifdef Q_OS_WIN32
     if (GameProcess::debugMonitor) {
         delete GameProcess::debugMonitor;
         GameProcess::debugMonitor = NULL;
     }
+    #endif
 
     delete silentSelfUpdater;
     silentSelfUpdater = NULL;

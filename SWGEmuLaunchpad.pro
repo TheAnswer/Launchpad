@@ -20,7 +20,6 @@ SOURCES += main.cpp\
     addloginserver.cpp \
     configparser.cpp \
     gameprocess.cpp \
-    windebugmonitor.cpp \
     selfupdater.cpp \
     installfromswg.cpp
 
@@ -32,7 +31,6 @@ HEADERS  += mainwindow.h \
     addloginserver.h \
     configparser.h \
     gameprocess.h \
-    windebugmonitor.h \
     selfupdater.h \
     singleinstance.h \
     installfromswg.h
@@ -62,6 +60,8 @@ RESOURCES += \
     rsources.qrc
 
 win32 {
+    SOURCES += windebugmonitor.cpp
+    HEADERS += windebugmonitor.h
     CONFIG += embed_manifest_exe
     QMAKE_LFLAGS_WINDOWS += /MANIFESTUAC:level=\'requireAdministrator\'
 }

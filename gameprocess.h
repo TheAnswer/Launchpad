@@ -42,8 +42,10 @@ private:
     QProcess* process;
     ConfigParser* configParser;
 
+#ifdef Q_OS_WIN32
 public:
     static WinDebugMonitor* debugMonitor;
+#endif
 };
 
 #endif // GAMEPROCESS_H
