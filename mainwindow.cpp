@@ -185,10 +185,10 @@ MainWindow::~MainWindow() {
     delete ui;
     ui = NULL;
 
-    delete settings;
+    //delete settings;
     settings = NULL;
 
-    delete loginServers;
+    //delete loginServers;
     loginServers = NULL;
 
     while (gameProcesses.size() > 0) {
@@ -205,7 +205,7 @@ MainWindow::~MainWindow() {
     }
     #endif
 
-    delete silentSelfUpdater;
+    //delete silentSelfUpdater;
     silentSelfUpdater = NULL;
 }
 
