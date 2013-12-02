@@ -1193,7 +1193,11 @@ void MainWindow::startSWG() {
     QString port = parser->getStringConfigValue("ClientGame", "loginServerAddress0", "loginServerPort0");
 
     if (loginAddress != server->getHost() || port != QString::number(server->getPort())) {
+#ifdef Q_OS_WIN32
         QFile loginFile(folder + "\\swgemu_login.cfg");
+#else
+        QFile loginFile(folder + "/swgemu_login.cfg");
+#endif
 
         if (loginFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QTextStream stream(&loginFile);
