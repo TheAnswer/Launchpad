@@ -77,7 +77,11 @@ int InstallFromSWG::copyFiles() {
             QDir(dir).mkpath(".");
         }
 
+#ifdef Q_OS_WIN32
         bool result = QFile::copy(swgfolder + "\\" + file.first, emuFolder + file.first);
+#else
+        bool result = QFile::copy(swgfolder + "/" + file.first, emuFolder + file.first);
+#endif
 
         //bool result = true;
         //QTimer::singleShot(0, this, SLOT(fileCopied(file.first, result)));
@@ -108,8 +112,13 @@ int InstallFromSWG::checkSWGFolder() {
     filesToCheck << "bottom.tre" << "data_animation_00.tre" << "data_texture_04.tre";
 
     for (int i = 0; i < filesToCheck.size(); ++i) {
+#ifdef Q_OS_WIN32
         if (!QFile(swgfolder + "\\" + filesToCheck.at(i)).exists())
             return 2;
+#else
+        if (!QFile(swgfolder + "/" + filesToCheck.at(i)).exists())
+            return 2;
+#endif
     }
 
     return 0;
