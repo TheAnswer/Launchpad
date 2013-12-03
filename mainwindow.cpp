@@ -17,6 +17,7 @@
 #include "selfupdater.h"
 #include <QCloseEvent>
 #include "installfromswg.h"
+#include "utils.h"
 
 #if QT_VERSION >= 0x050000
 #include <QtConcurrent/QtConcurrentRun>
@@ -245,7 +246,11 @@ void MainWindow::deleteProfiles() {
     QSettings settings;
     QString folder = settings.value("swg_folder").toString();
 
+#ifdef Q_OS_WIN32
     QDir dir(folder + "\\profiles");
+#else
+    QDir dir(folder + "/profiles");
+#endif
 
     if (!dir.exists()) {
         QMessageBox::warning(this, "Warning", "No profiles folder found");
@@ -962,7 +967,7 @@ void MainWindow::startKodanCalculator() {
 
     QStringList argsList;
     if (!args.isEmpty())
-        argsList = args.split(" ");
+        argsList = Utils::getArgumentList(args);
 
     argsList.append("KSWGProfCalcEditor.exe");
 
@@ -999,9 +1004,9 @@ void MainWindow::startSWGSetup() {
 
     QStringList argsList;
     if (!args.isEmpty())
-        argsList = args.split(" ");
+        argsList = Utils::getArgumentList(args);
 
-    argsList.append(folder + "\\" + "SWGEmu_Setup.exe");
+    argsList.append(folder + "/" + "SWGEmu_Setup.exe");
 
     qDebug() << argsList;
 

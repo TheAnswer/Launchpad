@@ -15,6 +15,8 @@
 #include <QDateTime>
 #include <QFileDialog>
 
+#include "utils.h"
+
 #ifdef Q_OS_WIN32
 WinDebugMonitor* GameProcess::debugMonitor = NULL;
 #endif
@@ -108,11 +110,20 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
 
     QStringList argsList;
     if (!args.isEmpty())
-        argsList = args.split(" ");
+        argsList = Utils::getArgumentList(args);
 
-    argsList.append(folder + "\\" + executable);
+    argsList.append(folder + "/" + executable);
 
     qDebug() << argsList;
+
+    QString envs = settings.value("wine_env").toString();
+    if (!envs.isEmpty()) {
+        env.append(Utils::getArgumentList(envs));
+
+        qDebug() << env;
+
+        process->setEnvironment(env);
+    }
 
     if (!QProcess::startDetached(wineBinary, argsList, folder)) {
         QMessageBox::warning(this, "ERROR", "Could not launch game settings!");

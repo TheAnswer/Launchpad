@@ -25,6 +25,7 @@ public slots:
   void updateMultiThreadedFullScan();
   void updateWineBinary();
   void updateWineArguments();
+  void updateWineEnvironment();
 
   void restoreCloseAfterStart();
   void restoreMimizeAfterStart();
@@ -33,6 +34,7 @@ public slots:
   void restoreFolder();
   void restoreWineBinary();
   void restoreWineArgs();
+  void restoreWineEnvironment();
 
   void closeAfterStartChanged(bool state);
   void minimizeToTrayAfterStartChanged(bool state);

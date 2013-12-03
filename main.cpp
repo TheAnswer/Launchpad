@@ -4,6 +4,7 @@
 #include "singleinstance.h"
 #endif
 #include <QMessageBox>
+#include "utils.h"
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
@@ -17,6 +18,8 @@ int main(int argc, char *argv[]) {
 //  if (!shared.create())
 
   //HANDLE instanceMutex = CreateMutex()
+
+
 
 #ifdef Q_OS_WIN32
   SingleInstance instance(TEXT("DCB15209-9E02-489D-9FD6-03689735BD49"));

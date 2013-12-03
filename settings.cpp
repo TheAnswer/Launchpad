@@ -16,6 +16,7 @@ Settings::Settings(QWidget *parent) :
     ui->checkBox_minimize->setChecked(settings.value("minimize_after_start", false).toBool());
     ui->checkBox_debug->setChecked(settings.value("capture_debug_output", false).toBool());
     ui->checkBox_multithreaded->setChecked(settings.value("multi_threaded_full_scan", false).toBool());
+    ui->lineEdit_wine_env->setText(settings.value("wine_env").toString());
     QString wineBinary = settings.value("wine_binary").toString();
 
     if (!wineBinary.isEmpty())
@@ -64,6 +65,7 @@ void Settings::updateAllOptions() {
     updateMultiThreadedFullScan();
     updateWineBinary();
     updateWineArguments();
+    updateWineEnvironment();
 }
 
 void Settings::updateMultiThreadedFullScan() {
@@ -117,6 +119,13 @@ void Settings::updateWineArguments() {
     settings.setValue("wine_args", arguments);
 }
 
+void Settings::updateWineEnvironment() {
+    QString env = ui->lineEdit_wine_env->text();
+
+    QSettings settings;
+    settings.setValue("wine_env", env);
+}
+
 void Settings::restoreOptions() {
     restoreFolder();
     restoreCloseAfterStart();
@@ -125,6 +134,13 @@ void Settings::restoreOptions() {
     restoreMultiThreadedFullScan();
     restoreWineArgs();
     restoreWineBinary();
+    restoreWineEnvironment();
+}
+
+void Settings::restoreWineEnvironment() {
+    QSettings settings;
+
+    ui->lineEdit_wine_env->setText(settings.value("wine_env").toString());
 }
 
 void Settings::restoreWineBinary() {

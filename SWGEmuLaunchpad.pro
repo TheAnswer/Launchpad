@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     configparser.cpp \
     gameprocess.cpp \
     selfupdater.cpp \
-    installfromswg.cpp
+    installfromswg.cpp \
+    utils.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -33,7 +34,8 @@ HEADERS  += mainwindow.h \
     gameprocess.h \
     selfupdater.h \
     singleinstance.h \
-    installfromswg.h
+    installfromswg.h \
+    utils.h
 
 FORMS    += mainwindow.ui \
     settings.ui \
