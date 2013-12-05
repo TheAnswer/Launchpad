@@ -23,6 +23,8 @@
 #include <QtConcurrent/QtConcurrentRun>
 #endif
 
+#include "gamemods.h"
+
 QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
@@ -31,7 +33,7 @@ QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
 #else
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux86_64.cfg";
 #endif
-const QString MainWindow::version = "0.18";
+const QString MainWindow::version = "0.19";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -82,6 +84,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addWidget(gameSettingsButton);
     connect(gameSettingsButton, SIGNAL(clicked()), this, SLOT(startSWGSetup()));
     toolButtons.append(gameSettingsButton);
+
+    QToolButton* gameModsButton = new QToolButton(ui->mainToolBar);
+    gameModsButton->setIcon(QIcon(":/img/magic.svg"));
+    gameModsButton->setText("Game mods");
+    gameModsButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->mainToolBar->addWidget(gameModsButton);
+    connect(gameModsButton, SIGNAL(clicked()), this, SLOT(showGameModsOptions()));
+    toolButtons.append(gameModsButton);
 
     QToolButton* profCalculatorButton = new QToolButton(ui->mainToolBar);
     profCalculatorButton->setIcon(QIcon(":/img/design.svg"));
@@ -180,6 +190,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     requiredFilesNetworkManager.get(QNetworkRequest(QUrl(patchUrl + "required2.txt")));
     silentSelfUpdater->silentCheck();
+
+    //gameMods = new GameMods(this);
 }
 
 MainWindow::~MainWindow() {
@@ -208,6 +220,8 @@ MainWindow::~MainWindow() {
 
     //delete silentSelfUpdater;
     silentSelfUpdater = NULL;
+
+    //gameMods = NULL;
 }
 
 void MainWindow::toolBarOrientationChanged(Qt::Orientation ) {
@@ -720,6 +734,11 @@ void MainWindow::updateFullScanProgress(QString successFile, bool success) {
 }
 
 void MainWindow::startFullScan(bool forceConfigRestore) {
+    if (!forceConfigRestore) {
+        if (QMessageBox::question(this, "Warning", "This will restore your files to their original state removing any mods you might have. Do you want to continue?") != QMessageBox::Yes)
+            return;
+    }
+
     requiredFilesCount = getRequiredFiles().size();
     currentReadFiles = 0;
 
@@ -1481,4 +1500,9 @@ void MainWindow::installSWGEmu() {
 
         startFullScan(true);
     }
+}
+
+void MainWindow::showGameModsOptions() {
+    GameMods dialog(this);
+    dialog.exec();
 }

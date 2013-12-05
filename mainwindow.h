@@ -17,6 +17,7 @@ class Settings;
 class LoginServers;
 class GameProcess;
 class SelfUpdater;
+class GameMods;
 
 namespace Ui {
   class MainWindow;
@@ -71,6 +72,8 @@ public slots:
   void systemTrayActivated(QSystemTrayIcon::ActivationReason reason);
   void deleteProfiles();
 
+  void showGameModsOptions();
+
   void fullScanFile(const QString& file, const QString& name, qint64, const QString &md5);
   void addFileToDownloadSlot(QString file); 
   int fullScanSingleThreaded(bool);
@@ -117,6 +120,8 @@ private:
   QAtomicInt fullScanWorkingThreads;
 
   QVector<QToolButton*> toolButtons;
+
+  //GameMods* gameMods;
 
 };
 

@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     gameprocess.cpp \
     selfupdater.cpp \
     installfromswg.cpp \
-    utils.cpp
+    utils.cpp \
+    gamemods.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -35,7 +36,8 @@ HEADERS  += mainwindow.h \
     selfupdater.h \
     singleinstance.h \
     installfromswg.h \
-    utils.h
+    utils.h \
+    gamemods.h
 
 FORMS    += mainwindow.ui \
     settings.ui \
@@ -43,7 +45,8 @@ FORMS    += mainwindow.ui \
     addloginserver.ui \
     gameprocess.ui \
     selfupdater.ui \
-    installfromswg.ui
+    installfromswg.ui \
+    gamemods.ui
 
 OTHER_FILES += \
     logo_yellow.png \
