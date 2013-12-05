@@ -135,10 +135,10 @@ void GameMods::setMovementMod(bool val) {
 
     if (val) {
         qDebug() << "settings movement mod";
-        QDir dir(swgFolder + "/object/creature/player/base");
+        QDir dir(swgFolder + "/object/creature/player/base/");
 
         if (!dir.exists())
-            dir.mkdir(".");
+            dir.mkpath(".");
 
         if (QFile(swgFolder + "/object/creature/player/base/shared_base_player.iff").exists())
             return;

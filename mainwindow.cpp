@@ -33,7 +33,7 @@ QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
 #else
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux86_64.cfg";
 #endif
-const QString MainWindow::version = "0.19";
+const QString MainWindow::version = "0.21";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
