@@ -140,6 +140,9 @@ void GameMods::setMovementMod(bool val) {
         if (!dir.exists())
             dir.mkdir(".");
 
+        if (QFile(swgFolder + "/object/creature/player/base/shared_base_player.iff").exists())
+            return;
+
         if (QFile::copy(":/files/shared_base_player.iff", swgFolder + "/object/creature/player/base/shared_base_player.iff")) {
             QFile file(swgFolder + "/object/creature/player/base/shared_base_player.iff");
             file.setPermissions(QFile::WriteUser);
