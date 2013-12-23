@@ -18,6 +18,7 @@ class LoginServers;
 class GameProcess;
 class SelfUpdater;
 class GameMods;
+class FileScanner;
 
 namespace Ui {
   class MainWindow;
@@ -35,7 +36,7 @@ public:
   static QString newsUrl;
   static QString gameExecutable;
   static const QString version;
-  static QString selfUpdateUrl;
+  static QString selfUpdateUrl;  
 
 public slots:
   void showSettings();
@@ -43,7 +44,7 @@ public slots:
   void startSWG();
   void loadFinished();
   //void fullScanFinished();
-  void startLoadBasicCheck();
+
   void startFullScan(bool forceConfigRestore = false);
   static QVector<QPair<QString, qint64> > getRequiredFiles();
   void downloadFinished();
@@ -53,7 +54,6 @@ public slots:
   void webPageLoadFinished(bool ok);
   void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
   void closeEvent(QCloseEvent *event);
-  int loadAndBasicCheckFiles(QString swgFolder);
 
   void triggerNews();
   void updateBasicLoadProgress(QString successFile);
@@ -71,24 +71,36 @@ public slots:
   QFile* getRequiredFilesFile();
   void systemTrayActivated(QSystemTrayIcon::ActivationReason reason);
   void deleteProfiles();
-
+  void startLoadBasicCheck();
   void showGameModsOptions();
 
-  void fullScanFile(const QString& file, const QString& name, qint64, const QString &md5);
+  //void fullScanFile(const QString& file, const QString& name, qint64, const QString &md5);
   void addFileToDownloadSlot(QString file); 
-  int fullScanSingleThreaded(bool);
-  void fullScanMultiThreaded(bool);
+  //int fullScanSingleThreaded(bool);
+  //void fullScanMultiThreaded(bool);
 
   void toolBarOrientationChanged(Qt::Orientation);
   void startKodanCalculator();
   void installSWGEmu();
 
+  bool decrementFullScanWorkingThreads() {
+      return fullScanWorkingThreads.deref();
+  }
+
+  volatile bool doCancelWorkingThreads() {
+      return cancelWorkingThreads;
+  }
+
+  void appendToFilesToDownloadStringList(const QString& file) {
+      filesToDownload.append(file);
+  }
+
 signals:
   void startDownload();
-  void requiredFileExists(QString);
-  void fullScannedFile(QString, bool);
+  //void requiredFileExists(QString);
+  //void fullScannedFile(QString, bool);
   void fileDownloaded(QString);
-  void addFileToDownload(QString);
+  //void addFileToDownload(QString);
 
 private:
   Ui::MainWindow *ui;
@@ -120,6 +132,7 @@ private:
   QAtomicInt fullScanWorkingThreads;
 
   QVector<QToolButton*> toolButtons;
+  FileScanner* fileScanner;
 
   //GameMods* gameMods;
 

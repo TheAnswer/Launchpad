@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     selfupdater.cpp \
     installfromswg.cpp \
     utils.cpp \
-    gamemods.cpp
+    gamemods.cpp \
+    macroeditor.cpp \
+    filescanner.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -37,7 +39,9 @@ HEADERS  += mainwindow.h \
     singleinstance.h \
     installfromswg.h \
     utils.h \
-    gamemods.h
+    gamemods.h \
+    macroeditor.h \
+    filescanner.h
 
 FORMS    += mainwindow.ui \
     settings.ui \
@@ -46,7 +50,8 @@ FORMS    += mainwindow.ui \
     gameprocess.ui \
     selfupdater.ui \
     installfromswg.ui \
-    gamemods.ui
+    gamemods.ui \
+    macroeditor.ui
 
 OTHER_FILES += \
     logo_yellow.png \

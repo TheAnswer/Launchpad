@@ -73,7 +73,6 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
         debugMonitor = new WinDebugMonitor();
     }
 
-
     connect(debugMonitor, SIGNAL(outputDebugString(int, QString)), this, SLOT(outputDebugString(int, QString)));
 
     if (!settings.value("close_after_start", false).toBool() && !debugMonitor->IsInitialized() && settings.value("capture_debug_output", false).toBool()) {
@@ -126,7 +125,7 @@ bool GameProcess::start(const QString& folder, const QString& executable, const 
     }
 
     if (!QProcess::startDetached(wineBinary, argsList, folder)) {
-        QMessageBox::warning(this, "ERROR", "Could not launch game settings!");
+        QMessageBox::warning(this, "ERROR", "Could not launch wine!");
     }
 #endif
     return true;

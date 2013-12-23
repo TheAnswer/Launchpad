@@ -18,6 +18,7 @@
 #include <QCloseEvent>
 #include "installfromswg.h"
 #include "utils.h"
+#include "filescanner.h"
 
 #if QT_VERSION >= 0x050000
 #include <QtConcurrent/QtConcurrentRun>
@@ -33,7 +34,7 @@ QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
 #else
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux86_64.cfg";
 #endif
-const QString MainWindow::version = "0.21";
+const QString MainWindow::version = "0.22";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     gameProcessesCount = 0;
     runningFullScan = false;
+
+    fileScanner = new FileScanner(this);
 
     settings = new Settings(this);
     loginServers = new LoginServers(this);
@@ -129,8 +132,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&requiredFilesNetworkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(requiredFileDownloadFileFinished(QNetworkReply*)));
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(webPageLoadFinished(bool)));
     connect(ui->pushButton_Start, SIGNAL(clicked()), this, SLOT(startSWG()));
-    connect(this, SIGNAL(requiredFileExists(QString)), this, SLOT(updateBasicLoadProgress(QString)));
-    connect(this, SIGNAL(fullScannedFile(QString, bool)), this, SLOT(updateFullScanProgress(QString, bool)));
+    connect(fileScanner, SIGNAL(requiredFileExists(QString)), this, SLOT(updateBasicLoadProgress(QString)));
+    connect(fileScanner, SIGNAL(fullScannedFile(QString, bool)), this, SLOT(updateFullScanProgress(QString, bool)));
     connect(this, SIGNAL(startDownload()), this, SLOT(startFileDownload()));
     connect(ui->actionLogin_Servers, SIGNAL(triggered()), loginServers, SLOT(show()));
     connect(ui->actionShow_news, SIGNAL(triggered()), this, SLOT(triggerNews()));
@@ -141,7 +144,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionGame_Settings, SIGNAL(triggered()), this, SLOT(startSWGSetup()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     connect(ui->actionDelete_Profiles, SIGNAL(triggered()), this, SLOT(deleteProfiles()));
-    connect(this, SIGNAL(addFileToDownload(QString)), this, SLOT(addFileToDownloadSlot(QString)));
+    connect(fileScanner, SIGNAL(addFileToDownload(QString)), this, SLOT(addFileToDownloadSlot(QString)));
     connect(ui->actionInstall_from_SWG, SIGNAL(triggered()), this, SLOT(installSWGEmu()));
 
     ui->groupBox_browser->hide();
@@ -173,7 +176,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (!swgFolder.isEmpty())
         startLoadBasicCheck();
     else
-        QMessageBox::warning(this, "Error", "Please set the swgemu folder in Settings->Options or install using Settings->Install From SWG");
+        QMessageBox::warning(this, "Error", "Please set the swgemu folder in Settings->Options or install using Settings->Install From SWG option");
 
     restoreGeometry(settingsOptions.value("mainWindowGeometry").toByteArray());
     restoreState(settingsOptions.value("mainWindowState").toByteArray());
@@ -197,6 +200,9 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow() {
     delete ui;
     ui = NULL;
+
+    //delete fileScanner;
+    fileScanner = NULL;
 
     //delete settings;
     settings = NULL;
@@ -359,33 +365,7 @@ void MainWindow::triggerNews() {
     }
 }
 
-int MainWindow::loadAndBasicCheckFiles(QString swgFolder) {
-    QVector<QPair<QString, qint64> > fileListToCheck = MainWindow::getRequiredFiles();
 
-    for (int i = 0; i < fileListToCheck.size() && !cancelWorkingThreads; ++i) {
-        const QPair<QString, qint64> data = fileListToCheck.at(i);
-        QString file = swgFolder + "/" + data.first;
-
-        QFile fileObject(file);
-
-        if (!fileObject.exists()) {
-            qDebug() << file << "doesnt exist";
-            return -1;
-        }
-
-        qint64 fileObjectSize = fileObject.size();
-
-        if (!data.first.contains(".exe") && fileObjectSize != data.second) {
-            qDebug() << file << " size mismatch found: " << fileObjectSize << " expected: " << data.second;
-            return -1;
-        }
-
-        if (!cancelWorkingThreads)
-            emit requiredFileExists(file);
-    }
-
-    return 0;
-}
 
 QFile* MainWindow::getRequiredFilesFile() {
     QSettings settings;
@@ -410,241 +390,6 @@ QFile* MainWindow::getRequiredFilesFile() {
     file->open(QIODevice::ReadOnly | QIODevice::Text);
 
     return file;
-}
-
-int MainWindow::fullScanSingleThreaded(bool ) {
-    QFile* file = getRequiredFilesFile();
-
-    QSettings settings;
-    QString swgFolder = settings.value("swg_folder").toString();
-
-    int res = 0;
-
-    while (!file->atEnd()) {
-        QByteArray line = file->readLine();
-        //process_line(line);
-
-        //QRegExp rx("(\\ |\\,|\\.|\\;|\\t)"); //RegEx for ' ' or ',' or '.' or ':' or '\t'
-        QList<QByteArray> query = line.split(';');
-
-        //QListIterator<QByteArray>
-
-        QString name = query.at(0);
-        QString size = query.at(1);
-        QString md5 = query.at(2).trimmed();
-
-        QString file = swgFolder + "/" + name;
-
-        QFile fileObject(file);
-
-        if (!fileObject.exists()) {
-            qDebug() << file << "doesnt exist";
-            //return -1;
-
-            filesToDownload.append(patchUrl + name);
-
-            if (!cancelWorkingThreads)
-                emit fullScannedFile(name, false);
-
-            continue;
-        }
-
-        QCryptographicHash crypto(QCryptographicHash::Md5);
-        if (!fileObject.open(QFile::ReadOnly)) {
-            qDebug() << "could not open file:" << file;
-            //return -1;
-
-            filesToDownload.append(patchUrl + name);
-
-            if (!cancelWorkingThreads)
-                emit fullScannedFile(name, false);
-
-            continue;
-        }
-
-        //qint64 totalSize = 0;
-
-        while (!fileObject.atEnd() && !cancelWorkingThreads){
-            crypto.addData(fileObject.read(8192));
-        }
-
-        QByteArray hash = crypto.result();
-        QString calculatedHash = hash.toHex().toUpper().trimmed();
-
-        int compareResult = calculatedHash.compare(md5);
-
-        if (compareResult != 0 && !cancelWorkingThreads) {
-            qDebug() << "hash mismatch for:" << file << " compare result:" << compareResult;
-
-            qDebug() << "calculated hash of:" << file << " is:" << calculatedHash << " and specified one is:" << md5;
-            res = 2;
-
-            filesToDownload.append(patchUrl + name);
-        }
-
-        if (!cancelWorkingThreads)
-            emit fullScannedFile(name, compareResult == 0);
-    }
-
-
-    /*
-    if (!cancelWorkingThreads)
-        emit startDownload();
-        */
-
-    delete file;
-
-    return res;
-}
-
-void  MainWindow::fullScanMultiThreaded(bool ) {
-    QFile* file = getRequiredFilesFile();
-
-    QSettings settings;
-    QString swgFolder = settings.value("swg_folder").toString();
-
-    while (!file->atEnd()) {
-        QByteArray line = file->readLine();
-        //process_line(line);
-
-        //QRegExp rx("(\\ |\\,|\\.|\\;|\\t)"); //RegEx for ' ' or ',' or '.' or ':' or '\t'
-        QList<QByteArray> query = line.split(';');
-
-        //QListIterator<QByteArray>
-
-        QString name = query.at(0);
-        QString size = query.at(1);
-        QString md5 = query.at(2).trimmed();
-
-        QString file = swgFolder + "/" + name;
-
-        //std::atomic<int> test;
-
-        QtConcurrent::run(this, &MainWindow::fullScanFile, file, name, size.toLongLong(), md5);
-        //emit progressTextChanged(file);
-/*
-        QFile fileObject(file);
-
-        if (!fileObject.exists()) {
-            qDebug() << file << "doesnt exist";
-            //return -1;
-
-            filesToDownload.append(patchUrl + name);
-
-            if (!cancelWorkingThreads)
-                emit fullScannedFile(name, false);
-
-            continue;
-        }
-
-        QCryptographicHash crypto(QCryptographicHash::Md5);
-        if (!fileObject.open(QFile::ReadOnly)) {
-            qDebug() << "could not open file:" << file;
-            //return -1;
-
-            filesToDownload.append(patchUrl + name);
-
-            if (!cancelWorkingThreads)
-                emit fullScannedFile(name, false);
-
-            continue;
-        }
-
-        //qint64 totalSize = 0;
-
-        while (!fileObject.atEnd() && !cancelWorkingThreads){
-            crypto.addData(fileObject.read(8192));
-        }
-
-        QByteArray hash = crypto.result();
-        QString calculatedHash = hash.toHex().toUpper().trimmed();
-
-        int compareResult = calculatedHash.compare(md5);
-
-        if (compareResult != 0 && !cancelWorkingThreads) {
-            qDebug() << "hash mismatch for:" << file << " compare result:" << compareResult;
-
-            qDebug() << "calculated hash of:" << file << " is:" << calculatedHash << " and specified one is:" << md5;
-            res = 2;
-
-            filesToDownload.append(patchUrl + name);
-        }
-
-        if (!cancelWorkingThreads)
-            emit fullScannedFile(name, compareResult == 0);
-            */
-    }
-
-
-    /*
-    if (!cancelWorkingThreads)
-        emit startDownload();
-        */
-
-    delete file;
-}
-
-void MainWindow::fullScanFile(const QString& file, const QString &name, qint64 , const QString& md5) {
-    QFile fileObject(file);
-
-    if (!fileObject.exists()) {
-        qDebug() << file << "doesnt exist";
-        //return -1;
-
-       // filesToDownload.append(patchUrl + name);
-
-        emit addFileToDownload(patchUrl + name);
-
-      //  if (!cancelWorkingThreads)
-            emit fullScannedFile(name, false);
-
-        fullScanWorkingThreads.deref();
-
-        return;
-    }
-
-    QCryptographicHash crypto(QCryptographicHash::Md5);
-    if (!fileObject.open(QFile::ReadOnly)) {
-        qDebug() << "could not open file:" << file;
-        //return -1;
-
-       // filesToDownload.append(patchUrl + name);
-
-        emit addFileToDownload(patchUrl + name);
-
-     //   if (!cancelWorkingThreads)
-            emit fullScannedFile(name, false);
-
-        fullScanWorkingThreads.deref();
-
-        return;
-    }
-
-    //qint64 totalSize = 0;
-
-    while (!fileObject.atEnd() && !cancelWorkingThreads){
-        crypto.addData(fileObject.read(8192));
-    }
-
-    QByteArray hash = crypto.result();
-    QString calculatedHash = hash.toHex().toUpper().trimmed();
-
-    int compareResult = calculatedHash.compare(md5);
-
-    if (compareResult != 0 && !cancelWorkingThreads) {
-        qDebug() << "hash mismatch for:" << file << " compare result:" << compareResult;
-
-        qDebug() << "calculated hash of:" << file << " is:" << calculatedHash << " and specified one is:" << md5;
-        //res = 2;
-
-        //filesToDownload.append(patchUrl + name);
-        emit addFileToDownload(patchUrl + name);
-    }
-
-   // if (!cancelWorkingThreads)
-        emit fullScannedFile(name, compareResult == 0);
-
-    fullScanWorkingThreads.deref();
 }
 
 void MainWindow::addFileToDownloadSlot(QString file) {
@@ -786,11 +531,11 @@ void MainWindow::startFullScan(bool forceConfigRestore) {
         fullScanWorkingThreads = getRequiredFiles().size();
 
         runningFullScan = true;
-        QtConcurrent::run(this, &MainWindow::fullScanMultiThreaded, restoreConfigFiles);
+        QtConcurrent::run(fileScanner, &FileScanner::fullScanMultiThreaded, restoreConfigFiles);
     } else {
         runningFullScan = true;
 
-        QFuture<int> future = QtConcurrent::run(this, &MainWindow::fullScanSingleThreaded, restoreConfigFiles);
+        QFuture<int> future = QtConcurrent::run(fileScanner, &FileScanner::fullScanSingleThreaded, restoreConfigFiles);
         fullScanWatcher.setFuture(future);
     }
 }
@@ -812,7 +557,7 @@ void MainWindow::startLoadBasicCheck() {
     QSettings settingsOptions;
     QString swgFolder = settingsOptions.value("swg_folder").toString();
 
-    QFuture<int> future = QtConcurrent::run(this, &MainWindow::loadAndBasicCheckFiles, swgFolder);
+    QFuture<int> future = QtConcurrent::run(fileScanner, &FileScanner::loadAndBasicCheckFiles, swgFolder);
     loadWatcher.setFuture(future);
 }
 
@@ -1090,7 +835,7 @@ void MainWindow::loadFinished() {
         ui->actionFolders->setEnabled(true);
 
         ui->label_current_work->setStyleSheet("color:red");
-        ui->label_current_work->setText("Basic checks failed.");
+        ui->label_current_work->setText("Basic checks failed. Please run full scan.");
         ui->progressBar_loading->setValue(ui->progressBar_loading->maximum());
     }
 }
@@ -1401,11 +1146,11 @@ void MainWindow::statusXmlIsReady(QNetworkReply* reply) {
         qint64 days = uptimeSeconds / 86400;
 
         if (days != 0) {
-            uptimeStream << days << (days == 1 ? " day " : " days ") << hours << (hours == 1 ? " hour " : " hours ") << minutes << (minutes == 1 ? " minute " : " minutes");
+            uptimeStream << days << (days == 1 ? " day " : " days ") << hours << (hours == 1 ? " hour " : " hours ") << minutes << (minutes == 1 ? " minute " : " minutes" );
         } else if (hours != 0) {
-            uptimeStream << hours << (hours == 1 ? " hour " : " hours ") << minutes << (minutes == 1 ? " minute " : " minutes");
+            uptimeStream << hours << (hours == 1 ? " hour " : " hours ") << minutes << (minutes == 1 ? " minute " : " minutes ");
         } else {
-            uptimeStream << minutes << (minutes == 1 ? " minute " : " minutes") << uptimeSeconds % 60 << " seconds";
+            uptimeStream << minutes << (minutes == 1 ? " minute " : " minutes ") << uptimeSeconds % 60 << " seconds";
         }
 
         stream << "<div align=\"center\">Uptime: " << uptimeString << " </div>";

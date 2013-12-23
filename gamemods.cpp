@@ -59,7 +59,7 @@ bool GameMods::checkFpsMod() {
 
             //qDebug() << array.toULong();
 
-            if (array[0] == (char)0xc7 && array[1] == (char)0x45 && array[2] == (char)0x94) {
+            if (array.size() == 3 && array[0] == (char)0xc7 && array[1] == (char)0x45 && array[2] == (char)0x94) {
                 if (executable.seek(FPS_ADDRESS + 3)) {
                     float val;
                     if (executable.read((char*)&val, 4) == 4) {
@@ -103,7 +103,7 @@ void GameMods::setFpsMod(int fps) {
         if (result) {
             QByteArray array = executable.read(3);
 
-            if (array[0] == (char)0xc7 && array[1] == (char)0x45 && array[2] == (char)0x94) {
+            if (array.size() == 3 && array[0] == (char)0xc7 && array[1] == (char)0x45 && array[2] == (char)0x94) {
                 if (executable.seek(FPS_ADDRESS + 3)) {
                     float val;
                     if (executable.read((char*)&val, 4) == 4) {
