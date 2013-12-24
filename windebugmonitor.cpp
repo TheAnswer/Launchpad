@@ -4,6 +4,14 @@
 #include "atlstr.h"
 
 WinDebugMonitor::WinDebugMonitor() {
+    m_hDBWinMutex = NULL;
+    m_hDBMonBuffer = NULL;
+    m_hEventBufferReady = NULL;
+    m_hEventDataReady = NULL;
+
+    m_hWinDebugMonitorThread = NULL;
+    m_bWinDebugMonStopped = TRUE;
+    m_pDBBuffer = NULL;
 }
 
 WinDebugMonitor::~WinDebugMonitor() {

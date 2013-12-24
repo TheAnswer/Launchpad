@@ -3,12 +3,10 @@
 
 MacroEditor::MacroEditor(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::MacroEditor)
-{
+    ui(new Ui::MacroEditor) {
     ui->setupUi(this);
 }
 
-MacroEditor::~MacroEditor()
-{
+MacroEditor::~MacroEditor() {
     delete ui;
 }
