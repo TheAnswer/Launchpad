@@ -7,6 +7,49 @@ FileScanner::FileScanner(MainWindow *main) {
     mainWindow = main;
 }
 
+bool FileScanner::checkSwgFolder(const QString& dirString) {
+    QDir dir(dirString);
+
+    if (!dir.exists())
+        return false;
+
+    QVector<QPair<QString, qint64> > fileListToCheck = MainWindow::getRequiredFiles();
+
+    int fileCountToCheck = fileListToCheck.size() / 3;
+    int currentFiles = 0;
+
+   // if (isARequiredFile())
+
+    QStringList files = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+
+    //qDebug() << "checking for " << fileCountToCheck << " files";
+
+    for (int i = 0; i < files.size(); ++i) {
+        if (isARequiredFile(files.at(i)))
+            currentFiles++;
+    }
+
+    //qDebug() << "found " << currentFiles << " swg files";
+
+    if (currentFiles < fileCountToCheck)
+        return false;
+
+    return true;
+}
+
+bool FileScanner::isARequiredFile(const QString& name) {
+    QVector<QPair<QString, qint64> > fileListToCheck = MainWindow::getRequiredFiles();
+
+    for (int i = 0; i < fileListToCheck.size(); ++i) {
+        const QPair<QString, qint64> data = fileListToCheck.at(i);
+
+        if (name.toLower() == data.first.toLower())
+            return true;
+    }
+
+    return false;
+}
+
 int FileScanner::loadAndBasicCheckFiles(QString swgFolder) {
     QVector<QPair<QString, qint64> > fileListToCheck = MainWindow::getRequiredFiles();
 

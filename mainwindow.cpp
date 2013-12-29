@@ -500,7 +500,7 @@ void MainWindow::startFullScan(bool forceConfigRestore) {
     QString folder = settings.value("swg_folder").toString();
     QDir checkDir(folder);
 
-    if (!checkDir.exists() || folder.isEmpty() || checkDir.count() < 15) {
+    if (!checkDir.exists() || folder.isEmpty() || !FileScanner::checkSwgFolder(folder)) {
         QMessageBox::warning(this, "ERROR", "Invalid game folder!");
 
         return;
