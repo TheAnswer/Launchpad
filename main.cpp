@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   SingleInstance instance(TEXT("DCB15209-9E02-489D-9FD6-03689735BD49"));
 
   if (instance.isAnotherInstanceRunning()) {
-      QMessageBox::critical(NULL, "ERROR", "There is a launchpad instance running already!");
+      QMessageBox::critical(NULL, "ERROR", "There is a launchpad instance running already, check your system tray!");
       return 1;
   }
 #endif

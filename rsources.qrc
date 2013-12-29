@@ -21,10 +21,14 @@
         <file>play2.svg</file>
         <file>design.svg</file>
         <file>magic.svg</file>
+        <file>ui_rebel_icons.dds</file>
+        <file>book.svg</file>
+        <file>ui_rebel_icons.png</file>
     </qresource>
     <qresource prefix="/files">
         <file>required2.txt</file>
         <file>required.txt</file>
         <file>shared_base_player.iff</file>
+        <file>icons.xml</file>
     </qresource>
 </RCC>

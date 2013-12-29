@@ -25,7 +25,11 @@ SOURCES += main.cpp\
     utils.cpp \
     gamemods.cpp \
     macroeditor.cpp \
-    filescanner.cpp
+    filescanner.cpp \
+    macroiconsgraphicsview.cpp \
+    editmacro.cpp \
+    gamemacro.cpp \
+    macroitemrect.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -41,7 +45,11 @@ HEADERS  += mainwindow.h \
     utils.h \
     gamemods.h \
     macroeditor.h \
-    filescanner.h
+    filescanner.h \
+    macroiconsgraphicsview.h \
+    editmacro.h \
+    gamemacro.h \
+    macroitemrect.h
 
 FORMS    += mainwindow.ui \
     settings.ui \
@@ -51,7 +59,8 @@ FORMS    += mainwindow.ui \
     selfupdater.ui \
     installfromswg.ui \
     gamemods.ui \
-    macroeditor.ui
+    macroeditor.ui \
+    editmacro.ui
 
 OTHER_FILES += \
     logo_yellow.png \

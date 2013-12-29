@@ -19,6 +19,7 @@
 #include "installfromswg.h"
 #include "utils.h"
 #include "filescanner.h"
+#include "macroeditor.h"
 
 #if QT_VERSION >= 0x050000
 #include <QtConcurrent/QtConcurrentRun>
@@ -95,6 +96,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addWidget(gameModsButton);
     connect(gameModsButton, SIGNAL(clicked()), this, SLOT(showGameModsOptions()));
     toolButtons.append(gameModsButton);
+
+    QToolButton* macroEditorButton = new QToolButton(ui->mainToolBar);
+    macroEditorButton->setIcon(QIcon(":/img/book.svg"));
+    macroEditorButton->setText("Macro Editor");
+    macroEditorButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->mainToolBar->addWidget(macroEditorButton);
+    connect(macroEditorButton, SIGNAL(clicked()), this, SLOT(showMacroEditor()));
+    toolButtons.append(macroEditorButton);
 
     QToolButton* profCalculatorButton = new QToolButton(ui->mainToolBar);
     profCalculatorButton->setIcon(QIcon(":/img/design.svg"));
@@ -1251,3 +1260,9 @@ void MainWindow::showGameModsOptions() {
     GameMods dialog(this);
     dialog.exec();
 }
+
+void MainWindow::showMacroEditor() {
+    MacroEditor dialog(this);
+    dialog.exec();
+}
+

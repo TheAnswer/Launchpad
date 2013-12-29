@@ -73,6 +73,7 @@ public slots:
   void deleteProfiles();
   void startLoadBasicCheck();
   void showGameModsOptions();
+  void showMacroEditor();
 
   //void fullScanFile(const QString& file, const QString& name, qint64, const QString &md5);
   void addFileToDownloadSlot(QString file); 
