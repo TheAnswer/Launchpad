@@ -27,13 +27,13 @@
 
 #include "gamemods.h"
 
-QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/";
+QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/"; // Insert download URL here
 QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 #ifdef Q_OS_WIN32
-QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg";
+QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg"; // Insert update URL here
 #else
-QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux86_64.cfg";
+QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux86_64.cfg"; // Insert linux update URL here
 #endif
 const QString MainWindow::version = "0.22";
 
@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addWidget(gameModsButton);
     connect(gameModsButton, SIGNAL(clicked()), this, SLOT(showGameModsOptions()));
     toolButtons.append(gameModsButton);
-
+/*
     QToolButton* macroEditorButton = new QToolButton(ui->mainToolBar);
     macroEditorButton->setIcon(QIcon(":/img/book.svg"));
     macroEditorButton->setText("Macro Editor");
@@ -104,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addWidget(macroEditorButton);
     connect(macroEditorButton, SIGNAL(clicked()), this, SLOT(showMacroEditor()));
     toolButtons.append(macroEditorButton);
-
+*/
     QToolButton* profCalculatorButton = new QToolButton(ui->mainToolBar);
     profCalculatorButton->setIcon(QIcon(":/img/design.svg"));
     profCalculatorButton->setText("Profession Calculator");
@@ -184,8 +184,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     if (!swgFolder.isEmpty())
         startLoadBasicCheck();
-    else
+    else {
+#ifdef Q_OS_WIN32
+        QDir dir("C:/SWGEmu");
+
+        if (dir.exists() && FileScanner::checkSwgFolder("C:/SWGEmu")) {
+            settingsOptions.setValue("swg_folder", "C:/SWGEmu");
+            startLoadBasicCheck();
+        } else
+#endif
         QMessageBox::warning(this, "Error", "Please set the swgemu folder in Settings->Options or install using Settings->Install From SWG option");
+    }
 
     restoreGeometry(settingsOptions.value("mainWindowGeometry").toByteArray());
     restoreState(settingsOptions.value("mainWindowState").toByteArray());
@@ -844,7 +853,7 @@ void MainWindow::loadFinished() {
         ui->actionFolders->setEnabled(true);
 
         ui->label_current_work->setStyleSheet("color:red");
-        ui->label_current_work->setText("Basic checks failed. Please run full scan.");
+        ui->label_current_work->setText("Basic checks failed. Please run full scan to try and fix the issues.");
         ui->progressBar_loading->setValue(ui->progressBar_loading->maximum());
     }
 }

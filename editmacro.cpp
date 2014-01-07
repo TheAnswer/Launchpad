@@ -17,7 +17,12 @@ EditMacro::EditMacro(GameMacro *macro, QWidget *parent) :
     ui->graphicsView->parseIconMetadata();
     ui->graphicsView->setCurrentIcon(macro->getIcon());
     ui->lineEdit_name->setText(macro->getName());
-    ui->plainTextEdit_contents->appendPlainText(macro->getContents());
+
+    QString macroContents = macro->getContents();
+
+    macroContents = macroContents.replace(";", ";\n");
+
+    ui->plainTextEdit_contents->appendPlainText(macroContents);
 }
 
 EditMacro::~EditMacro() {

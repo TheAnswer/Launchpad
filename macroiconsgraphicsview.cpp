@@ -79,28 +79,28 @@ void MacroIconsGraphicsView::parseIconMetadata() {
             if (rectValues.size() < 4)
                 continue;
 
-//            int x = rectValues.at(0).toInt();
-//            int y = rectValues.at(1).toInt();
+            //            int x = rectValues.at(0).toInt();
+            //            int y = rectValues.at(1).toInt();
 
-         //   int hash = ((x << 16) & 0xFFFF0000) | y;
+            //   int hash = ((x << 16) & 0xFFFF0000) | y;
 
             MacroItemRect* rectangle = new MacroItemRect(name, rectValues.at(0).toInt(),
-                                                                     rectValues.at(1).toInt(),
-                                                                     rectValues.at(2).toInt() - rectValues.at(0).toInt(),
-                                                                     rectValues.at(3).toInt() - rectValues.at(1).toInt());
+                                                         rectValues.at(1).toInt(),
+                                                         rectValues.at(2).toInt() - rectValues.at(0).toInt(),
+                                                         rectValues.at(3).toInt() - rectValues.at(1).toInt());
 
-                connect(rectangle, SIGNAL(iconClicked(MacroItemRect*)), this, SLOT(iconClicked(MacroItemRect*)));
+            connect(rectangle, SIGNAL(iconClicked(MacroItemRect*)), this, SLOT(iconClicked(MacroItemRect*)));
 
-                icons.insert(name, rectangle);
-                //rectangle->set
-                QPen pen = rectangle->pen();
-                pen.setWidth(2);
-                pen.setStyle(Qt::NoPen);
-                pen.setColor(Qt::white);
-                rectangle->setPen(pen);
+            icons.insert(name, rectangle);
+            //rectangle->set
+            QPen pen = rectangle->pen();
+            pen.setWidth(2);
+            pen.setStyle(Qt::NoPen);
+            pen.setColor(Qt::white);
+            rectangle->setPen(pen);
 
-                this->scene()->addItem(rectangle);
-  //          }
+            this->scene()->addItem(rectangle);
+            //          }
         }
     }
 
