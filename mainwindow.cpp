@@ -20,6 +20,8 @@
 #include "utils.h"
 #include "filescanner.h"
 #include "macroeditor.h"
+#include <QWebElement>
+#include <QWebFrame>
 
 #if QT_VERSION >= 0x050000
 #include <QtConcurrent/QtConcurrentRun>
@@ -27,20 +29,24 @@
 
 #include "gamemods.h"
 
+//#define ENABLE_MACRO_EDITOR
+
 QString MainWindow::patchUrl = "http://www.launchpad2.net/SWGEmu/"; // Insert download URL here
-QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
+//QString MainWindow::newsUrl = "http://www.swgemu.com/forums/index.php#bd";
+QString MainWindow::newsUrl = "http://www.swgemu.com/forums/forum.php";
 QString MainWindow::gameExecutable = "SWGEmu.exe";
 #ifdef Q_OS_WIN32
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setup.cfg"; // Insert update URL here
 #else
 QString MainWindow::selfUpdateUrl = "http://launchpad2.net/setuplinux86_64.cfg"; // Insert linux update URL here
 #endif
-const QString MainWindow::version = "0.22";
+const QString MainWindow::version = "0.23";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow), networkAccessManager(this), clientFilesNetworkAccessManager(this),
-    novaNetworkAccessManager(this), requiredFilesNetworkManager(this), fullScanWorkingThreads(0) {
+    novaNetworkAccessManager(this), requiredFilesNetworkManager(this), patchesNetworkManager(this),
+    fullScanWorkingThreads(0) {
     ui->setupUi(this);
 
     QCoreApplication::setOrganizationName("SWGEmu");
@@ -49,6 +55,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     requiredFilesCount = 0;
     nextFileToDownload = 0;
+
+    updateTimeCounter = 5;
 
     gameProcessesCount = 0;
     runningFullScan = false;
@@ -96,7 +104,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addWidget(gameModsButton);
     connect(gameModsButton, SIGNAL(clicked()), this, SLOT(showGameModsOptions()));
     toolButtons.append(gameModsButton);
-/*
+
+#ifdef ENABLE_MACRO_EDITOR
     QToolButton* macroEditorButton = new QToolButton(ui->mainToolBar);
     macroEditorButton->setIcon(QIcon(":/img/book.svg"));
     macroEditorButton->setText("Macro Editor");
@@ -104,7 +113,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addWidget(macroEditorButton);
     connect(macroEditorButton, SIGNAL(clicked()), this, SLOT(showMacroEditor()));
     toolButtons.append(macroEditorButton);
-*/
+#endif
+
     QToolButton* profCalculatorButton = new QToolButton(ui->mainToolBar);
     profCalculatorButton->setIcon(QIcon(":/img/design.svg"));
     profCalculatorButton->setText("Profession Calculator");
@@ -139,6 +149,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&novaNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(statusXmlIsReady(QNetworkReply*)) );
     connect(&clientFilesNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadFileFinished(QNetworkReply*)));
     connect(&requiredFilesNetworkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(requiredFileDownloadFileFinished(QNetworkReply*)));
+    connect(&patchesNetworkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(patchesDownloadFileFinished(QNetworkReply*)));
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(webPageLoadFinished(bool)));
     connect(ui->pushButton_Start, SIGNAL(clicked()), this, SLOT(startSWG()));
     connect(fileScanner, SIGNAL(requiredFileExists(QString)), this, SLOT(updateBasicLoadProgress(QString)));
@@ -210,7 +221,10 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     requiredFilesNetworkManager.get(QNetworkRequest(QUrl(patchUrl + "required2.txt")));
+    //patchesNetworkManager.get(QNetworkRequest(QUrl(patchUrl + "patches.txt")));
     silentSelfUpdater->silentCheck();
+
+    //ui->webView->setUrl(newsUrl);
 
     //gameMods = new GameMods(this);
 }
@@ -422,7 +436,7 @@ void MainWindow::showAboutDialog() {
 }
 
 void MainWindow::requiredFileDownloadFileFinished(QNetworkReply* reply) {
-    if (reply->error() != QNetworkReply::NoError) {
+    if (reply && reply->error() != QNetworkReply::NoError) {
        // QMessageBox::warning(this, "ERROR getting new patch information", reply->errorString());
 
         return;
@@ -461,6 +475,74 @@ void MainWindow::requiredFileDownloadFileFinished(QNetworkReply* reply) {
 
         QStringList currentFiles = getRequiredFiles();
         */
+}
+
+void MainWindow::patchesDownloadFileFinished(QNetworkReply* reply) {
+    if (reply && reply->error() != QNetworkReply::NoError) {
+        // QMessageBox::warning(this, "ERROR getting new patch information", reply->errorString());
+        updateTimeCounter = -1;
+        enableStart();
+
+        return;
+    }
+
+    try {
+    QString data = reply->readAll();
+
+    qDebug() << "got patches.txt" << data;
+
+    QTextStream file(&data);
+
+    QSettings settings;
+    QString swgFolder = settings.value("swg_folder").toString();
+
+    while (!file.atEnd()) {
+        QString fileString = file.readLine();
+
+        QByteArray line(fileString.toStdString().c_str());
+        //process_line(line);
+
+        //QRegExp rx("(\\ |\\,|\\.|\\;|\\t)"); //RegEx for ' ' or ',' or '.' or ':' or '\t'
+        QList<QByteArray> query = line.split(';');
+
+        //QListIterator<QByteArray>
+
+        QString name = query.at(0);
+        QString size = query.at(1);
+        QString md5 = query.at(2).trimmed();
+        QString action = query.at(3);
+
+        QString file = swgFolder + "/" + name;
+
+        QFile fileObject(file);
+
+        if ((action == "A") && !fileObject.exists()) {
+            qDebug() << file << "doesnt exist";
+            //return -1;
+
+            //filesToDownload.append(MainWindow::patchUrl + name);
+            appendToFilesToDownloadStringList(MainWindow::patchUrl + name);
+
+            continue;
+        } else if ((action == "D") && fileObject.exists()) {
+            fileObject.remove();
+        }
+    }
+    }
+    catch (...) {
+        enableStart();
+    }
+
+    if (filesToDownload.size() > 0) {
+        startFileDownload();
+
+        updateTimeCounter = -2;
+    } else {
+        updateTimeCounter = -1;
+
+        enableStart();
+    }
+
 }
 
 void MainWindow::updateBasicLoadProgress(QString successFile) {
@@ -563,8 +645,9 @@ void MainWindow::startLoadBasicCheck() {
         return;
 
     ui->pushButton_Start->setEnabled(false);
+//    ui->pushButton_Start->setText("Start (" + QString::number(updateTimeCounter) + ")");
     ui->label_current_work->setStyleSheet("color:black");
-    ui->label_current_work->setText("Checking files..");
+    ui->label_current_work->setText("Checking files and updates..");
 
     requiredFilesCount = getRequiredFiles().size();
     currentReadFiles = 0;
@@ -577,6 +660,26 @@ void MainWindow::startLoadBasicCheck() {
 
     QFuture<int> future = QtConcurrent::run(fileScanner, &FileScanner::loadAndBasicCheckFiles, swgFolder);
     loadWatcher.setFuture(future);
+
+    //QTimer::singleShot(1000, this, SLOT(runUpdateCheckTimer()));
+}
+
+void MainWindow::runUpdateCheckTimer() {
+    if (--updateTimeCounter >= 0) {
+        QTimer::singleShot(1000, this, SLOT(runUpdateCheckTimer()));
+
+        ui->pushButton_Start->setText("Start (" + QString::number(updateTimeCounter) + ")");
+    } else {
+        ui->pushButton_Start->setText("Start");
+
+        //ui->pushButton_Start->setEnabled(true);
+
+    //    qDebug() << "hui is: " << updateTimeCounter;
+
+        if (updateTimeCounter == -1) {
+            enableStart();
+        }
+    }
 }
 
 void MainWindow::startFileDownload() {
@@ -817,7 +920,7 @@ void MainWindow::downloadFinished() {
 
     qDebug() << "download finished";
 
-    startLoadBasicCheck();
+    //startLoadBasicCheck();
 }
 
 void MainWindow::showSettings() {
@@ -836,6 +939,16 @@ void MainWindow::fullScanFinished() {
         ui->label_current_work->setText("Full scan successfull");
 }
 */
+
+void MainWindow::enableStart() {
+    ui->pushButton_Start->setEnabled(true);
+    ui->pushButton_Start->setText("Start");
+    ui->actionFolders->setEnabled(true);
+
+    ui->label_current_work->setStyleSheet("color:green");
+    ui->label_current_work->setText("Basic checks passed.");
+}
+
 void MainWindow::loadFinished() {
     if (cancelWorkingThreads)
         return;
@@ -843,11 +956,17 @@ void MainWindow::loadFinished() {
     int res = loadWatcher.result();
 
     if (res == 0) {
-        ui->pushButton_Start->setEnabled(true);
-        ui->actionFolders->setEnabled(true);
+        if (updateTimeCounter < 0) {
+            enableStart();
+        } else {
+            updateTimeCounter = 5;
 
-        ui->label_current_work->setStyleSheet("color:green");
-        ui->label_current_work->setText("Basic checks passed.");
+            ui->pushButton_Start->setText("Start (" + QString::number(updateTimeCounter) + ")");
+
+            QTimer::singleShot(1000, this, SLOT(runUpdateCheckTimer()));
+
+            patchesNetworkManager.get(QNetworkRequest(QUrl(patchUrl + "patches.txt")));
+        }
     } else {
         ui->pushButton_Start->setEnabled(false);
         ui->actionFolders->setEnabled(true);
@@ -860,13 +979,14 @@ void MainWindow::loadFinished() {
 
 QVector<QPair<QString, qint64> > MainWindow::getRequiredFiles() {
     QSettings settings;
-    QString folder = settings.value("swg_folder").toString();
+    //QString folder = settings.value("swg_folder").toString();
 
     QVector<QPair<QString, qint64> > data;
 
     //QStringList files;
 
-    if (QDir(folder).exists()) {
+    //if (QDir(folder).exists()) {
+     {
         QFile file("required2.txt");
 
         if (file.exists()) {
@@ -891,6 +1011,7 @@ QVector<QPair<QString, qint64> > MainWindow::getRequiredFiles() {
             }
         }
     }
+
 
     QFile file(":/files/required2.txt");
 
@@ -1189,6 +1310,20 @@ void MainWindow::webPageLoadFinished(bool ok) {
     }
 
     ui->statusBar->showMessage("swgemu.com loaded.");
+
+   //updateDonationMeter();
+    //e.
+}
+
+void MainWindow::updateDonationMeter() {
+    QWebElement e = ui->webView->page()->mainFrame()->findFirstElement("span#ds_bar_67_percentText");
+
+    QString value = e.toPlainText();
+    QString num = value.mid(0, value.indexOf("%"));
+
+    ui->donationBar->setValue(num.toInt());
+
+    ui->label_current_work->setText("Donation meter loaded.");
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

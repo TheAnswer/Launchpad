@@ -29,6 +29,9 @@
    </item>
    <item row="0" column="3">
     <widget class="QPushButton" name="pushButton_add_account">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Add</string>
      </property>
@@ -56,6 +59,9 @@
    </item>
    <item row="3" column="0">
     <widget class="QPushButton" name="pushButton_add_macro">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Add</string>
      </property>
@@ -70,6 +76,9 @@
    </item>
    <item row="3" column="2">
     <widget class="QPushButton" name="pushButton_remove">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Remove</string>
      </property>
@@ -90,6 +99,9 @@
    </item>
    <item row="4" column="0">
     <widget class="QPushButton" name="pushButton_backup">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Backup to file</string>
      </property>
@@ -97,6 +109,9 @@
    </item>
    <item row="4" column="1">
     <widget class="QPushButton" name="pushButton_restore">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Restore backup</string>
      </property>
@@ -116,13 +131,6 @@
     <widget class="QListWidget" name="listWidget"/>
    </item>
   </layout>
-  <zorder>graphicsView</zorder>
-  <zorder>label</zorder>
-  <zorder>label_2</zorder>
-  <zorder>plainTextEdit</zorder>
-  <zorder>label</zorder>
-  <zorder>label_3</zorder>
-  <zorder>lineEdit</zorder>
   <zorder>label</zorder>
   <zorder>comboBox_accounts</zorder>
   <zorder>listWidget</zorder>

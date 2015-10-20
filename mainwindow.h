@@ -66,6 +66,8 @@ public slots:
   void closeTab(int index);
   void checkForUpdates();
   void requiredFileDownloadFileFinished(QNetworkReply* reply);
+  void patchesDownloadFileFinished(QNetworkReply* reply);
+  void runUpdateCheckTimer();
   void startSWGSetup();
   void showAboutDialog();
   QFile* getRequiredFilesFile();
@@ -75,6 +77,8 @@ public slots:
   void showGameModsOptions();
   void showMacroEditor();
 
+  void updateDonationMeter();
+
   //void fullScanFile(const QString& file, const QString& name, qint64, const QString &md5);
   void addFileToDownloadSlot(QString file); 
   //int fullScanSingleThreaded(bool);
@@ -83,6 +87,8 @@ public slots:
   void toolBarOrientationChanged(Qt::Orientation);
   void startKodanCalculator();
   void installSWGEmu();
+
+  void enableStart();
 
   bool decrementFullScanWorkingThreads() {
       return fullScanWorkingThreads.deref();
@@ -111,6 +117,7 @@ private:
   QNetworkAccessManager clientFilesNetworkAccessManager;
   QNetworkAccessManager novaNetworkAccessManager;
   QNetworkAccessManager requiredFilesNetworkManager;
+  QNetworkAccessManager patchesNetworkManager;
   QFutureWatcher<int> loadWatcher;
   QFutureWatcher<int> fullScanWatcher;
   QFutureWatcher<int> downloadWatcher;
@@ -129,6 +136,8 @@ private:
   QAction* closeAction;
   volatile bool runningFullScan;
   int gameProcessesCount;
+
+  int updateTimeCounter;
 
   QAtomicInt fullScanWorkingThreads;
 

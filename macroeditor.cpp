@@ -13,12 +13,29 @@ MacroEditor::MacroEditor(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->pushButton_edit, SIGNAL(clicked()), this, SLOT(editCurrentSelectedMacro()));
+    connect(ui->comboBox_accounts, SIGNAL(currentTextChanged(QString)), this, SLOT(accountChanged(QString)));
+    connect(ui->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(macroDoubleClicked(QListWidgetItem*)));
 
     loadAccounts();
 }
 
 MacroEditor::~MacroEditor() {
     delete ui;
+}
+
+void MacroEditor::accountChanged(QString account) {
+    ui->listWidget->clear();
+
+    loadMacros(account);
+}
+
+void MacroEditor::macroDoubleClicked(QListWidgetItem* item) {
+    GameMacro* macro = dynamic_cast<GameMacro*>(item);
+
+    if (macro == NULL)
+        return;
+
+    editCurrentSelectedMacro();
 }
 
 void MacroEditor::loadAccounts() {
@@ -39,7 +56,7 @@ void MacroEditor::loadAccounts() {
         ui->comboBox_accounts->addItem(accounts.at(i));
     }
 
-    loadMacros(accounts.at(0));
+  //  loadMacros(accounts.at(0));
 }
 
 void MacroEditor::loadMacros(const QString& account) {
@@ -60,12 +77,12 @@ void MacroEditor::loadMacros(const QString& account) {
     QStringList macros = loadMacroNames(file);
 
     QMap<int, GameMacro*>::iterator i;
-     for (i = gameMacros.begin(); i != gameMacros.end(); ++i) {
-         //cout << i.key() << ": " << i.value() << endl;
-         GameMacro* macro = i.value();
+    for (i = gameMacros.begin(); i != gameMacros.end(); ++i) {
+        //cout << i.key() << ": " << i.value() << endl;
+        GameMacro* macro = i.value();
 
-         ui->listWidget->addItem(macro);
-     }
+        ui->listWidget->addItem(macro);
+    }
 }
 
 QStringList MacroEditor::loadMacroNames(QFile& macrosFile) {

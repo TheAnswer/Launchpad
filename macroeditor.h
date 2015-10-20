@@ -22,6 +22,8 @@ public:
 
 public slots:
     void editCurrentSelectedMacro();
+    void accountChanged(QString account);
+    void macroDoubleClicked(QListWidgetItem* item);
 
 protected:
     void loadAccounts();
